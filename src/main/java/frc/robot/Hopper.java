@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 //import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DigitalInput;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Hopper {
     // public DigitalInput intake_sense = new DigitalInput(0);
@@ -13,6 +14,12 @@ public class Hopper {
     public DigitalInput hopper_ball_b_sense = new DigitalInput(2);
     public DigitalInput hopper_ball_c_sense = new DigitalInput(3);
     public DigitalInput shooter_ball_sense = new DigitalInput(4);
+
+    private double begin_time = 0;
+    private double current_time = 0;
+
+    public int hopperState = 0;
+
     boolean intake_to_hopper_sensor = false;
     boolean prev_intake_to_hopper_sensor = false;
     boolean hopper_ball_a = false; // closer to intake
@@ -35,7 +42,15 @@ public class Hopper {
     double shooter_feeder_wheel = -0.4;
     boolean intakeSwitch = true;
 
-    
+    public void WTF() {
+        if(hopperState == 0){
+            retract();
+        } else if(hopperState == 1){
+            movement(false, 3600);
+        } else if(hopperState == 2){
+            
+        }
+    }
 
     public Hopper(HwMotor motor) {
         this.motor = motor;
@@ -116,8 +131,23 @@ public class Hopper {
         }
     }
 
-    public void return(){
-        
+    public void retract(){
+        if(!intake_to_hopper_sensor){
+            hopper_infeed.set(-1 * belt_speed);
+            hopper.set(-1 * belt_speed);
+        }
+    }
+
+    public void stopShoot(){
+        if(begin_time == 0){
+            begin_time = Timer.getFPGATimestamp();
+        }
+        current_time = Timer.getFPGATimestamp();
+        if(current_time - begin_time == 5){
+            begin_time = 0;
+            current_time = 0;
+            retract();
+        }
     }
 
     public void readArduino() {

@@ -34,6 +34,9 @@ public class Teleop {
     private boolean climber_current_pos = false; // false is retracted true is extended
     public static boolean colorSelectionTime = false;
 
+
+    public static boolean reversing = false;
+
     public void run() {
         double leftSpeed = jstick.leftJoystick.getY();
         double rightSpeed = jstick.rightJoystick.getY();
@@ -131,11 +134,11 @@ public class Teleop {
 
         // manually run the intake
         hopper.readArduino(); // update sensor values
-        if (jstick.xbox.getTriggerAxis(Hand.kRight) > 0.1) {
-            hopper.movement(false, rpm);
-        } else if (jstick.rightJoystick.getTrigger()) {
+        if (jstick.rightJoystick.getTrigger()) {
             hopper.movement(true, rpm);
             intake.off();
+        } else if(jstick.rightJoystick.getTriggerReleased()){
+            reversing = true;
         } else {
             if(jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.1)
                 motor.miniShooter.set(-1 * jstick.xbox.getTriggerAxis(Hand.kLeft));
@@ -163,7 +166,6 @@ public class Teleop {
             color.colorRotation(jstick.xbox.getAButton());
         }
 
-        // control.manipulate(WheelSpeed);
     }
 
     public void drive(double leftPower, double rightPower) {
