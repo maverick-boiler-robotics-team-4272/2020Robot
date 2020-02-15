@@ -1,0 +1,34 @@
+drive sticks:
+  left joystick trigger = aiming with limelight
+  left axis = left drive velocity
+
+  right joystick trigger pressed = shoot the balls in hopper
+  right joystick trigger released = reverse balls
+  right axis = right drive velocity
+
+  
+
+xbox controller:
+    left side:
+    
+        joystick up = increase target rpm for shooter wheel
+        joystick down  = decrease target rpm for shooter wheel
+
+        back button = disable shooter wheel
+        start button = start shooter wheel
+  
+        left bumper = toggle led on or off
+
+    right side:
+    
+        y button = toggle limelight pipelines
+
+        a button = start rotation for stage two on color wheel
+
+        right bumper = toggle limelight pipeline
+
+        right trigger with other buttons:
+            with a pressed = set color to green for third stage in color wheel
+            with b pressed = set color to red for third stage in color wheel
+            with y pressed = set color to yellow for third stage in color wheel
+            with x pressed = set color to blue for third stage in color wheel

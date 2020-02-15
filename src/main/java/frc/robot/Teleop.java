@@ -20,12 +20,12 @@ public class Teleop {
     private HwJoystick jstick = new HwJoystick();
     private Camera camera = new Camera();
     public HwMotor motor = new HwMotor();
-    private Hopper hopper = new Hopper(motor);
     private Shooter shooter = new Shooter(motor);
     private HwPneumatics pneumatics = new HwPneumatics();
     private Climber climber = new Climber(pneumatics);
     private Intake intake = new Intake(pneumatics, motor);
     private ColorThing color = new ColorThing(motor);
+    private Hopper hopper = new Hopper(motor, intake);
     // private auto is_Auto = new auto();
     boolean is_auto = false;
     double percentOutput = 0;
@@ -40,7 +40,6 @@ public class Teleop {
     public void run() {
         double leftSpeed = jstick.leftJoystick.getY();
         double rightSpeed = jstick.rightJoystick.getY();
-        // double WheelSpeed = jstick.xbox.getTriggerAxis(Hand.kRight);
 
         if (Math.abs(leftSpeed) < deadzone) {
             leftSpeed = 0;
@@ -66,9 +65,6 @@ public class Teleop {
             }
         }
 
-        /*
-         * if(Math.abs(WheelSpeed) < 0.1){ WheelSpeed = 0; }
-         */
 
         if (leftSpeed > 0)
             leftSpeed *= leftSpeed;
@@ -78,15 +74,6 @@ public class Teleop {
             rightSpeed *= rightSpeed;
         else
             rightSpeed *= -1 * rightSpeed;
-        // if(jstick.xbox.getYButtonPressed()){
-        // is_auto = true;
-        // }
-        // if(jstick.xbox.getAButtonPressed()){
-        // is_auto = false;
-        // }
-        // if(is_auto){
-        // Auto.drive(0.5);
-        // }
 
         camera.updateLimelightTracking();
 
@@ -100,12 +87,6 @@ public class Teleop {
 
         if (Math.abs(jstick.xbox.getY(Hand.kLeft)) > 0.5) {
             rpm -= 10 * jstick.xbox.getY(Hand.kLeft);
-        }
-        // shootActive = jstick.rightJoystick.getTrigger();
-        if (jstick.xbox.getStartButtonPressed()) {
-            shootActive = true;
-        } else if (jstick.xbox.getBackButtonPressed()) {
-            shootActive = false;
         }
         shooter.sendNumbers();
 
@@ -134,24 +115,24 @@ public class Teleop {
 
         // manually run the intake
         hopper.readArduino(); // update sensor values
-        if (jstick.rightJoystick.getTrigger()) {
-            hopper.movement(true, rpm);
-            intake.off();
+        if (jstick.rightJoystick.getTriggerPressed()) {
+            hopper.shoot_balls();
+            shootActive = true;
         } else if(jstick.rightJoystick.getTriggerReleased()){
-            reversing = true;
+            hopper.reverse_balls();
+            shootActive = false;
+        }
+
+        if(jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.3){
+            hopper.movement(false);
+            intake.out();
         } else {
-            if(jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.1)
-                motor.miniShooter.set(-1 * jstick.xbox.getTriggerAxis(Hand.kLeft));
-            else
-                hopper.disable();
-            motor.intake.set(0);
+            hopper.disable();
+            intake.in();
         }
         motor.intakeVel.setNumber(motor.intakeEncoder.getVelocity());
         motor.intakeTemp.setNumber(motor.intake.getMotorTemperature());
 
-        // if(jstick.xbox.getTriggerAxis(Hand.kRight)>0.3){
-        // control.hopper.movement(true);
-        // }
         if (jstick.xbox.getTriggerAxis(Hand.kRight) > 0) {
             if (jstick.xbox.getAButton()) {
                 color.colorSelection("Green");
@@ -165,7 +146,7 @@ public class Teleop {
         } else {
             color.colorRotation(jstick.xbox.getAButton());
         }
-
+        hopper.loop(rpm);
     }
 
     public void drive(double leftPower, double rightPower) {

@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 
 /**
  * Add your docs here.
  */
 public class NewAuto {
+    DifferentialDriveKinematicsConstraint driveContraints = new DifferentialDriveKinematicsConstraint(kinematics, 10);
     TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(10), Units.feetToMeters(5));
     public void trajectoryConfig() {
 

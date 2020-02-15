@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkMax;
 
 //import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DigitalInput;
-import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Hopper {
@@ -18,7 +17,6 @@ public class Hopper {
     private double begin_time = 0;
     private double current_time = 0;
 
-    public int hopperState = 0;
 
     boolean intake_to_hopper_sensor = false;
     boolean prev_intake_to_hopper_sensor = false;
@@ -27,6 +25,10 @@ public class Hopper {
     boolean hopper_ball_c = false; // closer to shooter
     boolean shooter_ball = false;
 
+    public boolean is_shooting = false;
+    public boolean is_intaking = false;
+    public boolean is_stopping = false;
+
     // private I2C Wire;
     // private static final int MAX_BYTES = 32;
     // private int lightState;
@@ -34,48 +36,80 @@ public class Hopper {
     int num_balls_in_hopper = 0;
 
     HwMotor motor;
+    Intake intake_control;
+
     CANSparkMax hopper_infeed;
     CANSparkMax hopper;
     CANSparkMax shooter_infeed;
-    CANSparkMax intake;
     double belt_speed = -0.4;
     double shooter_feeder_wheel = -0.4;
     boolean intakeSwitch = true;
 
-    public void WTF() {
-        if(hopperState == 0){
-            retract();
-        } else if(hopperState == 1){
-            movement(false, 3600);
-        } else if(hopperState == 2){
-            
+    double rpm;
+    
+
+    public void loop(double rpm) {
+        if(is_shooting){
+            movement(true);
+        } else if(is_intaking){
+            movement(false);
+        } else if(is_stopping){
+            stopShoot();
+        } else {
+            disable();
         }
+        this.rpm = rpm;
     }
 
-    public Hopper(HwMotor motor) {
+    //the below functions are to make sure loop does not break and so teleop can call it
+    public void shoot_balls(){
+        is_shooting = true;
+        is_intaking = false;
+        is_stopping = false;
+    }
+
+    public void intake_balls(){
+        is_shooting = false;
+        is_intaking = true;
+        is_stopping = false;
+    }
+
+    public void reverse_balls(){
+        is_shooting = false;
+        is_intaking = false;
+        is_stopping = true;
+    }
+
+    public void stop_hopper(){
+        is_shooting = false;
+        is_intaking = false;
+        is_stopping = false;
+    }
+
+    public Hopper(HwMotor motor, Intake intake) {
         this.motor = motor;
         hopper_infeed = motor.hopper_infeed;
         hopper = motor.hopper;
         shooter_infeed = motor.miniShooter;
-        intake = motor.intake;
+        this.intake_control = intake;
     }
 
-    public void movement(boolean shoot_button, double targetRpm) {
+    public void movement(boolean shoot_button) {
         // readArduino();
-        double upperDifference = (targetRpm / Shooter.SENSOR_TO_RPM) * 1.02;
-        double lowerDifference = (targetRpm / Shooter.SENSOR_TO_RPM) * 0.98;
+        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.02;
+        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.98;
         if (!shoot_button) {
             if (!shooter_ball) {
                 if (intake_to_hopper_sensor && (hopper_ball_a || hopper_ball_b || hopper_ball_c)) {
                     shooter_infeed.set(shooter_feeder_wheel);
                     hopper_infeed.set(0);
                     hopper.set(belt_speed);
-                    intake.set(0);
+                    intake_control.off();
                 } else {
                     shooter_infeed.set(shooter_feeder_wheel);
                     hopper_infeed.set(belt_speed);
                     hopper.set(belt_speed);
-                    motor.intakePID.setReference(4000, ControlType.kVelocity);
+                    intake_control.on();
                 }
             } else {
                 if (intake_to_hopper_sensor) {
@@ -85,36 +119,36 @@ public class Hopper {
                                 shooter_infeed.set(0);
                                 hopper_infeed.set(belt_speed);
                                 hopper.set(belt_speed);
-                                motor.intakePID.setReference(4000, ControlType.kVelocity);
+                                intake_control.on();
                             } else {
                                 shooter_infeed.set(0);
                                 hopper_infeed.set(belt_speed);
                                 hopper.set(belt_speed);
-                                motor.intakePID.setReference(4000, ControlType.kVelocity);
+                                intake_control.on();
                             }
                         } else {
                             shooter_infeed.set(0);
                             hopper_infeed.set(belt_speed);
                             hopper.set(belt_speed);
-                            motor.intakePID.setReference(4000, ControlType.kVelocity);
+                            intake_control.on();
                         }
                     } else {
                         shooter_infeed.set(0);
                         hopper_infeed.set(0);
                         hopper.set(0);
-                        intake.set(0);
+                        intake_control.off();
                     }
                 } else {
                     if (hopper_ball_a || hopper_ball_b || hopper_ball_c) {
                         shooter_infeed.set(0);
                         hopper_infeed.set(belt_speed);
                         hopper.set(0);
-                        motor.intakePID.setReference(4000, ControlType.kVelocity);
+                        intake_control.on();
                     } else {
                         shooter_infeed.set(0);
                         hopper_infeed.set(belt_speed);
                         hopper.set(belt_speed);
-                        motor.intakePID.setReference(4000, ControlType.kVelocity);
+                        intake_control.on();
                     }
                 }
             }
@@ -135,6 +169,8 @@ public class Hopper {
         if(!intake_to_hopper_sensor){
             hopper_infeed.set(-1 * belt_speed);
             hopper.set(-1 * belt_speed);
+        } else {
+            current_time = 0;
         }
     }
 
@@ -143,9 +179,8 @@ public class Hopper {
             begin_time = Timer.getFPGATimestamp();
         }
         current_time = Timer.getFPGATimestamp();
-        if(current_time - begin_time == 5){
+        if(current_time - begin_time >= 5){
             begin_time = 0;
-            current_time = 0;
             retract();
         }
     }
@@ -243,6 +278,6 @@ public class Hopper {
         hopper.set(0);
         hopper_infeed.set(0);
         shooter_infeed.set(0);
-        // intake.set(0);
+        intake_control.off();
     }
 }
