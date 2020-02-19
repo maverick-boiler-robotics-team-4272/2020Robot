@@ -27,8 +27,10 @@ xbox controller:
 
         right bumper = toggle limelight pipeline
 
+        x buttone pressed does intake/hopper cool stuff
+
         right trigger with other buttons:
-            with a pressed = set color to green for third stage in color wheel
-            with b pressed = set color to red for third stage in color wheel
-            with y pressed = set color to yellow for third stage in color wheel
-            with x pressed = set color to blue for third stage in color wheel
+            a pressed CPM manual movement
+            x pressed = set color to blue for third stage in color wheel*/
+            b pressed CPM pneumatics
+            y pressed climber pneumatics

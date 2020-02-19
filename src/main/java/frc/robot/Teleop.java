@@ -16,16 +16,11 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class Teleop {
     private final double deadzone = 0.05;
-
-    private HwJoystick jstick = new HwJoystick();
-    private Camera camera = new Camera();
-    public HwMotor motor = new HwMotor();
-    private Shooter shooter = new Shooter(motor);
-    private HwPneumatics pneumatics = new HwPneumatics();
-    private Climber climber = new Climber(pneumatics);
-    private Intake intake = new Intake(pneumatics, motor);
-    private ColorThing color = new ColorThing(motor);
-    private Hopper hopper = new Hopper(motor, intake);
+    Robot robot;
+    public Teleop(Robot robot){
+        this.robot = robot;
+    }
+    
     // private auto is_Auto = new auto();
     boolean is_auto = false;
     double percentOutput = 0;
@@ -38,8 +33,8 @@ public class Teleop {
     public static boolean reversing = false;
 
     public void run() {
-        double leftSpeed = jstick.leftJoystick.getY();
-        double rightSpeed = jstick.rightJoystick.getY();
+        double leftSpeed = robot.jstick.leftJoystick.getY();
+        double rightSpeed = robot.jstick.rightJoystick.getY();
 
         if (Math.abs(leftSpeed) < deadzone) {
             leftSpeed = 0;
@@ -75,85 +70,89 @@ public class Teleop {
         else
             rightSpeed *= -1 * rightSpeed;
 
-        camera.updateLimelightTracking();
+        robot.camera.updateLimelightTracking();
 
-        if (jstick.leftJoystick.getTrigger()) {
-            leftSpeed = camera.m_LimelightDriveCommand - camera.m_LimelightSteerCommand;
-            rightSpeed = camera.m_LimelightDriveCommand + camera.m_LimelightSteerCommand;
+        if (robot.jstick.leftJoystick.getTrigger()) {
+            leftSpeed = robot.camera.m_LimelightDriveCommand - robot.camera.m_LimelightSteerCommand;
+            rightSpeed = robot.camera.m_LimelightDriveCommand + robot.camera.m_LimelightSteerCommand;
             drive(leftSpeed, rightSpeed);
         } else {
             drive(leftSpeed, rightSpeed);
         }
 
-        if (Math.abs(jstick.xbox.getY(Hand.kLeft)) > 0.5) {
-            rpm -= 10 * jstick.xbox.getY(Hand.kLeft);
+        if (Math.abs(robot.jstick.xbox.getY(Hand.kLeft)) > 0.5) {
+            rpm -= 10 * robot.jstick.xbox.getY(Hand.kLeft);
         }
-        shooter.sendNumbers();
+        robot.shooter.sendNumbers();
 
         if (shootActive) {
-            shooter.setShooterRPM(rpm);
+            robot.shooter.setShooterRPM(rpm);
         } else {
-            shooter.shooterDisable();
+            robot.shooter.shooterDisable();
         }
 
-        if (jstick.xbox.getBumperPressed(Hand.kLeft)) {
-            camera.changingLed();
+        if (robot.jstick.xbox.getBumperPressed(Hand.kLeft)) {
+            robot.camera.changingLed();
         }
-        if (jstick.xbox.getBumperPressed(Hand.kRight)) {
-            camera.changingPipeline();
+        if (robot.jstick.xbox.getBumperPressed(Hand.kRight)) {
+            robot.camera.changingPipeline();
         }
 
-        if (jstick.xbox.getYButtonPressed()) {
+        if (robot.jstick.xbox.getYButtonPressed()) {
             if (climber_current_pos) {
                 climber_current_pos = false;
-                climber.up();
+                robot.climber.up();
             } else {
                 climber_current_pos = true;
-                climber.down();
+                robot.climber.down();
             }
         }
 
         // manually run the intake
-        hopper.readArduino(); // update sensor values
-        if (jstick.rightJoystick.getTriggerPressed()) {
-            hopper.shoot_balls();
+        robot.hopper.readArduino(); // update sensor values
+        if (robot.jstick.rightJoystick.getTriggerPressed()) {
+            robot.hopper.shoot_balls();
             shootActive = true;
-        } else if(jstick.rightJoystick.getTriggerReleased()){
-            hopper.reverse_balls();
+        } else if(robot.jstick.rightJoystick.getTriggerReleased()){
+            robot.hopper.reverse_balls();
             shootActive = false;
         }
 
-        if(jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.3){
-            hopper.movement(false);
-            intake.out();
+        if(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.3){
+            robot.hopper.movement(false);
+            robot.intake.out();
         } else {
-            hopper.disable();
-            intake.in();
+            robot.hopper.disable();
+            robot.intake.in();
         }
-        motor.intakeVel.setNumber(motor.intakeEncoder.getVelocity());
-        motor.intakeTemp.setNumber(motor.intake.getMotorTemperature());
+        
+        robot.motor.ball1.setBoolean(true);
+        robot.motor.ball2.setBoolean(true);
+        robot.motor.ball3.setBoolean(true);
+        robot.motor.ball4.setBoolean(true);
+        robot.motor.ball5.setBoolean(true);
 
-        if (jstick.xbox.getTriggerAxis(Hand.kRight) > 0) {
-            if (jstick.xbox.getAButton()) {
-                color.colorSelection("Green");
-            } else if (jstick.xbox.getBButton()) {
-                color.colorSelection("Red");
-            } else if (jstick.xbox.getYButton()) {
-                color.colorSelection("Yellow");
-            } else if (jstick.xbox.getXButton()) {
-                color.colorSelection("Blue");
+        if (robot.jstick.xbox.getTriggerAxis(Hand.kRight) > 0.2) {
+            if(robot.jstick.xbox.getAButton()){
+                robot.motor.CPM.set(0.5);
+            }
+            if (robot.jstick.xbox.getBButton()) {
+                // robot.color.colorSelection("Red");
+                robot.pneumatics.CPMPneumatics(true);
+            } else if (robot.jstick.xbox.getYButton()) {
+                // robot.color.colorSelection("Yellow");\
+                robot.pneumatics.climberPneumatics(true);
+            } else if (robot.jstick.xbox.getXButton()) {
+                robot.color.doTheColorPosition();
             }
         } else {
-            color.colorRotation(jstick.xbox.getAButton());
+            robot.color.colorRotation(robot.jstick.xbox.getAButton());
         }
-        hopper.loop(rpm);
+        robot.hopper.loop(rpm);
     }
 
     public void drive(double leftPower, double rightPower) {
-        rightPower = -1 * rightPower;
-        motor.left1.set(leftPower);
-        motor.left2.set(leftPower);
-        motor.right1.set(rightPower);
-        motor.right2.set(rightPower);
+        robot.motor.left1.set(leftPower);
+        robot.motor.right1.set(rightPower);
     }
 }

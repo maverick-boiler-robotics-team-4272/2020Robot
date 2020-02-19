@@ -12,15 +12,15 @@ public class Intake{
         this.motor = motor;
     }
     public void off(){
-        pneumatics.intake.set(kOff);
+        pneumatics.intakeSolenoid.set(kOff);
         motor.intake.set(0);
     }
     public void out(){
-        pneumatics.intake.set(kForward);
+        pneumatics.intakeSolenoid.set(kForward);
         motor.intake.set(intake_speed);
     }
     public void in(){
-        pneumatics.intake.set(kReverse);
+        pneumatics.intakeSolenoid.set(kReverse);
         motor.intake.set(0);
     }
     public void on(){

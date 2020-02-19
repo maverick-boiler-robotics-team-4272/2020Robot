@@ -8,12 +8,12 @@ public class Climber{
         this.pneumatics = pneumatics;
     }
     public void off(){
-        pneumatics.climber.set(kOff);
+        pneumatics.climberSolenoid.set(kOff);
     }
     public void up(){
-        pneumatics.climber.set(kForward);
+        pneumatics.climberSolenoid.set(kForward);
     }
     public void down(){
-        pneumatics.climber.set(kReverse);
+        pneumatics.climberSolenoid.set(kReverse);
     }
 }

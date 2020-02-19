@@ -11,7 +11,9 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
@@ -19,6 +21,9 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.util.Units;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -30,8 +35,12 @@ import com.revrobotics.CANPIDController;
 public class HwMotor {
     public final CANSparkMax left1 = new CANSparkMax(1, MotorType.kBrushless);
     public final CANSparkMax left2 = new CANSparkMax(2, MotorType.kBrushless);
+    public final CANEncoder leftEncoder = left1.getEncoder();
+    public final CANPIDController leftPID = left1.getPIDController();
     public final CANSparkMax right1 = new CANSparkMax(3, MotorType.kBrushless);
     public final CANSparkMax right2 = new CANSparkMax(4, MotorType.kBrushless);
+    public final CANEncoder rightEncoder = right1.getEncoder();
+    public final CANPIDController rightPID = right1.getPIDController();
     public final CANSparkMax CPM = new CANSparkMax(20, MotorType.kBrushless);
 
     public final CANSparkMax hopper_infeed = new CANSparkMax(10, MotorType.kBrushless);
@@ -43,6 +52,9 @@ public class HwMotor {
     
     public final TalonSRX shooter1 = new TalonSRX(15);
     public final TalonSRX shooter2 = new TalonSRX(16);
+
+    public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
+    public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(11, 11, 11);
     
 
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -60,6 +72,21 @@ public class HwMotor {
     public NetworkTableEntry intakeTemp = table.getEntry("IntakeTemp");
     public NetworkTableEntry shooterOutput = table.getEntry("ShooterOutput");
     public NetworkTableEntry shooterVelSetPoint = table.getEntry("ShooterVelocitySetPoint");
+    private NetworkTableEntry drivePrekP = table.getEntry("drivekP");
+    private NetworkTableEntry drivePrekI = table.getEntry("drivekI");
+    private NetworkTableEntry drivePrekD = table.getEntry("drivekD");
+    private NetworkTableEntry drivePrekF = table.getEntry("drivekF");
+    public NetworkTableEntry rightDriveVel = table.getEntry("rightDriveVelocity");
+    public NetworkTableEntry rightDriveOutput = table.getEntry("rightDriveOutput");
+    public NetworkTableEntry rightDriveVelSetpoint = table.getEntry("rightSetpointReadout");
+    public NetworkTableEntry leftDriveVel = table.getEntry("leftDriveVelocity");
+    public NetworkTableEntry leftDriveOutput = table.getEntry("leftDriveOutput");
+    public NetworkTableEntry leftDriveVelSetpoint = table.getEntry("leftSetpointReadout");
+    public NetworkTableEntry ball1 = table.getEntry("BallAStatus");
+    public NetworkTableEntry ball2 = table.getEntry("BallBStatus");
+    public NetworkTableEntry ball3 = table.getEntry("BallCStatus");
+    public NetworkTableEntry ball4 = table.getEntry("BallDStatus");
+    public NetworkTableEntry ball5 = table.getEntry("BallEStatus");
 
     private double kP = 0;
     private double kF = 0;
@@ -69,6 +96,13 @@ public class HwMotor {
     private double intake_kF = 0;
     private double intake_kI = 0;
     private double intake_kD = 0;
+
+    private double drivekP = 0;
+    private double drivekI = 0;
+    private double drivekD = 0;
+    private double drivekF = 0;
+
+
 
     public HwMotor() {
         shooter2.follow(shooter1);
@@ -111,6 +145,28 @@ public class HwMotor {
         intake_pre_kF.setDouble(0.000093);
         intake_pre_kI.setDouble(0);
         intake_pre_kD.setDouble(0);
+
+        left2.follow(left1);
+        right2.follow(right1);
+        right1.setInverted(true);
+        leftEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
+        rightEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
+
+        rightPID.setOutputRange(-1, 1);
+        rightPID.setP(drivekP);
+        rightPID.setI(drivekI);
+        rightPID.setD(drivekD);
+        rightPID.setFF(drivekF);
+        leftPID.setOutputRange(-1, 1);
+        leftPID.setP(drivekP);
+        leftPID.setI(drivekI);
+        leftPID.setD(drivekD);
+        leftPID.setFF(drivekF);
+
+        drivePrekP.setDouble(0);
+        drivePrekF.setDouble(0.000093);
+        drivePrekI.setDouble(0);
+        drivePrekD.setDouble(0);
 
 
         table.addEntryListener("shooter_kP", new TableEntryListener() {
@@ -185,9 +241,67 @@ public class HwMotor {
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
+        table.addEntryListener("rightkP", new TableEntryListener() {
+            @Override
+            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
+                double driveNewKP = value.getDouble();
+                rightPID.setP(driveNewKP);
+                leftPID.setP(driveNewKP);
+            }
+            
+        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+        table.addEntryListener("rightkI", new TableEntryListener() {
+            @Override
+            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
+                double driveNewKI = value.getDouble();
+                rightPID.setI(driveNewKI);
+                leftPID.setI(driveNewKI);
+            }
+            
+        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+        table.addEntryListener("rightkD", new TableEntryListener() {
+            @Override
+            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
+                double driveNewKD = value.getDouble();
+                rightPID.setD(driveNewKD);
+                leftPID.setD(driveNewKD);
+            }
+            
+        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+        table.addEntryListener("rightkF", new TableEntryListener() {
+            @Override
+            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
+                double driveNewKF = value.getDouble();
+                rightPID.setFF(driveNewKF);
+                leftPID.setFF(driveNewKF);
+            }
+            
+        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
 
         intake.setSmartCurrentLimit(40, 20, 1000);
         
+    }
+
+    public void logNetworkTables(){
+        intakeVel.setNumber(intakeEncoder.getVelocity());
+        intakeTemp.setNumber(intake.getMotorTemperature());
+        rightDriveVel.setNumber(rightEncoder.getVelocity());
+        rightDriveOutput.setNumber(right1.getAppliedOutput());
+        leftDriveVel.setNumber(leftEncoder.getVelocity());
+        leftDriveOutput.setNumber(left1.getAppliedOutput());
+    }
+
+    public void setLeftVelocity(double rpmSetpoint, double feedforward){
+        leftPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
+        leftDriveVelSetpoint.setNumber(rpmSetpoint);
+    }
+
+    public void setRightVelocity(double rpmSetpoint, double feedforward){
+        rightPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
+        rightDriveVelSetpoint.setNumber(rpmSetpoint);
     }
 }

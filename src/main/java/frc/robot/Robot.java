@@ -18,16 +18,24 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
-
   private Teleop teleop;
-
+  public HwJoystick jstick = new HwJoystick();
+  public Camera camera = new Camera();
+  public HwMotor motor = new HwMotor();
+  public Shooter shooter = new Shooter(motor);
+  public HwPneumatics pneumatics = new HwPneumatics();
+  public Climber climber = new Climber(pneumatics);
+  public Intake intake = new Intake(pneumatics, motor);
+  public ColorThing color = new ColorThing(motor);
+  public Hopper hopper = new Hopper(motor, intake);
+  public NewAuto auto = new NewAuto(motor);
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   @Override
   public void robotInit() {
-    teleop = new Teleop();
+    teleop = new Teleop(this);
     System.out.println("The STALLION is ready");
   }
 
@@ -41,6 +49,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    
   }
 
   /**
@@ -57,6 +66,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    auto.generateTrajectory();
   }
 
   /**
@@ -73,6 +83,7 @@ public class Robot extends TimedRobot {
         // Put default auto code here
         break;
     }*/
+    auto.loop();
   }
 
   /**

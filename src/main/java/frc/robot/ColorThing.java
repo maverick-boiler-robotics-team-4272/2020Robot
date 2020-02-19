@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -14,6 +15,7 @@ import com.revrobotics.ColorMatch;
 //   NetworkTableEntry proximit = table.getEntry("proximity");
 
 public class ColorThing {
+  Robot robot;
 
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
@@ -151,29 +153,64 @@ public class ColorThing {
     }
 
     if(color == "Yellow"){
-      if(colorString != "Yellow"){
+      if(colorString != "Green"){
         motor.CPM.set(0.3);
       }else{
         motor.CPM.set(0);
       }
     }else if(color == "Blue"){
-      if(colorString != "Blue"){
-        motor.CPM.set(0.3);
-      }else{
-        motor.CPM.set(0);
-      }
-    }else if(color == "Red"){
       if(colorString != "Red"){
         motor.CPM.set(0.3);
       }else{
         motor.CPM.set(0);
       }
-    }else if(color == "Green"){
-      if(colorString != "Green"){ // this was == not !=
+    }else if(color == "Red"){
+      if(colorString != "Blue"){
         motor.CPM.set(0.3);
       }else{
         motor.CPM.set(0);
       }
+    }else if(color == "Green"){
+      if(colorString != "Yellow"){ // this was == not !=
+        motor.CPM.set(0.3);
+      }else{
+        motor.CPM.set(0);
+      }
+    }
+  }
+
+  public String colorFromDriveStation(){
+    String gameData = DriverStation.getInstance().getGameSpecificMessage();
+    if(gameData.length() > 0){
+      switch(gameData.charAt(0)){
+        case 'B' :
+          return "blue";
+        case 'G' :
+          return "green";
+        case 'R' :
+          return "red";
+        case 'Y' :
+          return "yellow";
+        default :
+          return "undefined";
+      }
+    }else{
+      return "undefined";
+    }
+  }
+
+  public void doTheColorPosition(){
+    if(colorFromDriveStation() == "green"){
+      colorSelection("Green");
+    }
+    if(colorFromDriveStation() == "red"){
+      colorSelection("Red");
+    }
+    if(colorFromDriveStation() == "blue"){
+      colorSelection("Blue");
+    }
+    if(colorFromDriveStation() == "yellow"){
+      colorSelection("Yellow");
     }
   }
 }
