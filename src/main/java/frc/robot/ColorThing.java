@@ -44,7 +44,7 @@ public class ColorThing {
   private int rotations = 8;
   private String current_color;
   private HwMotor motor;
-  private boolean is_spinning = false;
+  private boolean is_spinning;
 
   public ColorThing(HwMotor motor) {
     m_colorMatcher.addColorMatch(kBlueTarget);
@@ -54,6 +54,7 @@ public class ColorThing {
     m_colorMatcher.addColorMatch(kFakeYellowTarget);
     m_colorMatcher.addColorMatch(kFakeGreenTarget);
     this.motor = motor;
+    is_spinning = false;
   }
 
   public void colorRotation(boolean reset) {
@@ -125,7 +126,7 @@ public class ColorThing {
       is_spinning = true;
     }
     
-    if(is_spinning){
+    if(/*is_spinning*/reset){
        motor.CPM.set(1);
      } else {
       motor.CPM.set(0);

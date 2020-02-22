@@ -22,6 +22,7 @@ public class Shooter {
 
     public void setShooterRPM(double rpm){
         motor.shooter1.set(ControlMode.Velocity, rpm / SENSOR_TO_RPM);
+        // motor.shooter1.set(ControlMode.PercentOutput, -0.2);
         motor.shooterVelSetPoint.setNumber(rpm);
     }
 

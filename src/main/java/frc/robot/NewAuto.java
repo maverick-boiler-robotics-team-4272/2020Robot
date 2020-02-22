@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.util.Units;
  * Add your docs here.
  */
 public class NewAuto {
-    HwMotor motor;
+    Robot robot;
     RamseteController ramsete = new RamseteController();
     DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(Units.inchesToMeters(27));
     DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 10);
@@ -44,8 +44,8 @@ public class NewAuto {
     private Supplier<Pose2d> pose;
 
 
-    public NewAuto(HwMotor motor){
-        this.motor = motor;
+    public NewAuto(Robot robot){
+        this.robot = robot;
     }
 
     public void trajectoryConfig() {
@@ -53,7 +53,7 @@ public class NewAuto {
     }
 
     public void generateTrajectory() {
-        driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * motor.ahrs.getFusedHeading()));
+        driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
         config.addConstraint(driveContraint);
         var sideStart = new Pose2d(Units.feetToMeters(0), Units.feetToMeters(0), Rotation2d.fromDegrees(-180));
         var crossScale = new Pose2d(Units.feetToMeters(1), Units.feetToMeters(0), Rotation2d.fromDegrees(0));
@@ -73,21 +73,25 @@ public class NewAuto {
         var targetWheelSpeed = driveKinematics.toWheelSpeeds(ramsete.calculate(pose.get(), trajectory.sample(curTime)));
         double leftVelocity = wheelSpeeds.leftMetersPerSecond;
         double rightVelocity = wheelSpeeds.rightMetersPerSecond;
-        double leftFeedforward = motor.driveFeedForward.calculate(leftVelocity, leftVelocity - prevSpeeds.leftMetersPerSecond / dt);
-        double rightFeedforward = motor.driveFeedForward.calculate(rightVelocity, rightVelocity - prevSpeeds.rightMetersPerSecond / dt);
+        double leftFeedforward = robot.motor.driveFeedForward.calculate(leftVelocity, leftVelocity - prevSpeeds.leftMetersPerSecond / dt);
+        double rightFeedforward = robot.motor.driveFeedForward.calculate(rightVelocity, rightVelocity - prevSpeeds.rightMetersPerSecond / dt);
 
-        double rightPosition = motor.rightEncoder.getPosition();
-        double leftPosition = motor.leftEncoder.getPosition();
-        driveOdometry.update(Rotation2d.fromDegrees(motor.ahrs.getFusedHeading() * -1), leftPosition, rightPosition);
+        double rightPosition = robot.motor.rightEncoder.getPosition();
+        double leftPosition = robot.motor.leftEncoder.getPosition();
+        driveOdometry.update(Rotation2d.fromDegrees(robot.motor.ahrs.getFusedHeading() * -1), leftPosition, rightPosition);
         
-        motor.setRightVelocity(rightVelocity, rightFeedforward);
-        motor.setLeftVelocity(leftVelocity, leftFeedforward);
+        robot.motor.setRightVelocity(rightVelocity, rightFeedforward);
+        robot.motor.setLeftVelocity(leftVelocity, leftFeedforward);
         
         prevTime = curTime;
         prevSpeeds = targetWheelSpeed;
+        if(pose == goal){
+            robot.intake.out(0.5);
+        }
     }
 
     public void startAuto(){
         autoStartTime = Timer.getFPGATimestamp();
     }
+
 }

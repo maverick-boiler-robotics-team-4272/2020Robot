@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
@@ -49,6 +50,9 @@ public class HwMotor {
     public final CANSparkMax intake = new CANSparkMax(13, MotorType.kBrushless);
     public final CANPIDController intakePID;
     public final CANEncoder intakeEncoder = intake.getEncoder();
+    public final CANSparkMax intake2 = new CANSparkMax(14, MotorType.kBrushless);
+    public final CANSparkMax climberRight = new CANSparkMax(22, MotorType.kBrushless);
+    public final CANSparkMax climberLeft = new CANSparkMax(23, MotorType.kBrushless);
     
     public final TalonSRX shooter1 = new TalonSRX(15);
     public final TalonSRX shooter2 = new TalonSRX(16);
@@ -111,6 +115,7 @@ public class HwMotor {
         shooter2.setSensorPhase(true);
         shooter1.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms);
         shooter1.configVelocityMeasurementWindow(16);
+        shooter1.setInverted(false);
         
         shooter1.configNominalOutputForward(0, 30);
 		shooter1.configNominalOutputReverse(0, 30);
@@ -128,7 +133,7 @@ public class HwMotor {
         shooter1.enableVoltageCompensation(true);
         
         pre_kP.setDouble(0.25);
-        pre_kF.setDouble(0.0155);
+        pre_kF.setDouble(0.014);
         pre_kI.setDouble(0.001);
         pre_kD.setDouble(0.08);
 
@@ -140,6 +145,7 @@ public class HwMotor {
         intakePID.setI(intake_kI);
         intakePID.setD(intake_kD);
         intakePID.setFF(intake_kF);
+        // intake2.follow(intake, true);
 
         intake_pre_kP.setDouble(0);
         intake_pre_kF.setDouble(0.000093);
@@ -167,6 +173,14 @@ public class HwMotor {
         drivePrekF.setDouble(0.000093);
         drivePrekI.setDouble(0);
         drivePrekD.setDouble(0);
+
+        // climberLeft.follow(climberRight);
+        //climberLeft.follow(null);
+        // climberLeft.setInverted(true);
+        climberLeft.getEncoder().setPosition(0);
+        climberRight.getEncoder().setPosition(0);
+        climberLeft.setSoftLimit(SoftLimitDirection.kForward, 0);
+        climberRight.setSoftLimit(SoftLimitDirection.kForward, 0);
 
 
         table.addEntryListener("shooter_kP", new TableEntryListener() {
@@ -283,6 +297,9 @@ public class HwMotor {
 
 
         intake.setSmartCurrentLimit(40, 20, 1000);
+        intake2.setSmartCurrentLimit(40, 20, 1000);
+
+        CPM.setSmartCurrentLimit(40);
         
     }
 
@@ -303,5 +320,9 @@ public class HwMotor {
     public void setRightVelocity(double rpmSetpoint, double feedforward){
         rightPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
         rightDriveVelSetpoint.setNumber(rpmSetpoint);
+    }
+
+    public void climberExtend(double power){
+        climberRight.set(power);
     }
 }

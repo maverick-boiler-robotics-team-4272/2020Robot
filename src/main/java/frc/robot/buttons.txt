@@ -19,18 +19,21 @@ xbox controller:
   
         left bumper = toggle led on or off
 
+        left trigger = intake stuff
+        
+
     right side:
     
-        y button = toggle limelight pipelines
+        y button = climber pneumatics
 
         a button = start rotation for stage two on color wheel
 
         right bumper = toggle limelight pipeline
 
-        x buttone pressed does intake/hopper cool stuff
+        x button pressed does intake/hopper cool stuff
 
         right trigger with other buttons:
             a pressed CPM manual movement
             x pressed = set color to blue for third stage in color wheel*/
             b pressed CPM pneumatics
-            y pressed climber pneumatics
+           

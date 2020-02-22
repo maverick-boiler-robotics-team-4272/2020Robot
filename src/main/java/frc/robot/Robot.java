@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
   public Intake intake = new Intake(pneumatics, motor);
   public ColorThing color = new ColorThing(motor);
   public Hopper hopper = new Hopper(motor, intake);
-  public NewAuto auto = new NewAuto(motor);
+  public NewAuto auto;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -66,6 +66,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    auto.startAuto();
     auto.generateTrajectory();
   }
 

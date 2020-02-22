@@ -1,29 +1,27 @@
 package frc.robot;
 
+
 import com.revrobotics.CANSparkMax;
 
 //import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 
 public class Hopper {
     // public DigitalInput intake_sense = new DigitalInput(0);
-    public DigitalInput intake_to_hopper_sense = new DigitalInput(0);
-    public DigitalInput hopper_ball_a_sense = new DigitalInput(1);
-    public DigitalInput hopper_ball_b_sense = new DigitalInput(2);
-    public DigitalInput hopper_ball_c_sense = new DigitalInput(3);
-    public DigitalInput shooter_ball_sense = new DigitalInput(4);
-
-    private double begin_time = 0;
-    private double current_time = 0;
+    public DigitalInput intake_to_hopper_sense = new DigitalInput(10);
+    public DigitalInput hopper_ball_a_sense = new DigitalInput(11);
+    public DigitalInput hopper_ball_b_sense = new DigitalInput(12);
+    public DigitalInput hopper_ball_c_sense = new DigitalInput(13);
+    public DigitalInput shooter_ball_sense = new DigitalInput(14);
 
 
-    boolean intake_to_hopper_sensor = false;
-    boolean prev_intake_to_hopper_sensor = false;
-    boolean hopper_ball_a = false; // closer to intake
-    boolean hopper_ball_b = false;
-    boolean hopper_ball_c = false; // closer to shooter
-    boolean shooter_ball = false;
+
+    public boolean intake_to_hopper_sensor = false;
+    public boolean prev_intake_to_hopper_sensor = false;
+    public boolean hopper_ball_a = false; // closer to intake
+    public boolean hopper_ball_b = false;
+    public boolean hopper_ball_c = false; // closer to shooter
+    public boolean shooter_ball = false;
 
     public boolean is_shooting = false;
     public boolean is_intaking = false;
@@ -44,17 +42,26 @@ public class Hopper {
     double belt_speed = -0.4;
     double shooter_feeder_wheel = -0.4;
     boolean intakeSwitch = true;
+    public boolean needCorrections = false;
 
     double rpm;
+
+    public Hopper(HwMotor motor, Intake intake) {
+        this.motor = motor;
+        hopper_infeed = motor.hopper_infeed;
+        hopper = motor.hopper;
+        shooter_infeed = motor.miniShooter;
+        this.intake_control = intake;
+    }
     
 
     public void loop(double rpm) {
         if(is_shooting){
-            movement(true);
+            movement(true, false);
         } else if(is_intaking){
-            movement(false);
+            movement(false, false);
         } else if(is_stopping){
-            stopShoot();
+            //movement(false, true);
         } else {
             disable();
         }
@@ -86,18 +93,13 @@ public class Hopper {
         is_stopping = false;
     }
 
-    public Hopper(HwMotor motor, Intake intake) {
-        this.motor = motor;
-        hopper_infeed = motor.hopper_infeed;
-        hopper = motor.hopper;
-        shooter_infeed = motor.miniShooter;
-        this.intake_control = intake;
-    }
+    
 
-    public void movement(boolean shoot_button) {
+    public void movement(boolean shoot_button, boolean reverse) {
         // readArduino();
-        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.02;
-        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.98;
+        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.1;
+        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.9;
+        //if(!reverse){
         if (!shoot_button) {
             if (!shooter_ball) {
                 if (intake_to_hopper_sensor && (hopper_ball_a || hopper_ball_b || hopper_ball_c)) {
@@ -162,27 +164,14 @@ public class Hopper {
                 hopper_infeed.set(0);
                 hopper.set(0);
             }
-        }
+        }/*} else {
+            retract();
+        }*/
     }
 
     public void retract(){
-        if(!intake_to_hopper_sensor){
-            hopper_infeed.set(-1 * belt_speed);
-            hopper.set(-1 * belt_speed);
-        } else {
-            current_time = 0;
-        }
-    }
-
-    public void stopShoot(){
-        if(begin_time == 0){
-            begin_time = Timer.getFPGATimestamp();
-        }
-        current_time = Timer.getFPGATimestamp();
-        if(current_time - begin_time >= 5){
-            begin_time = 0;
-            retract();
-        }
+        hopper_infeed.set(-1 * belt_speed);
+        hopper.set(-1 * belt_speed);
     }
 
     public void readArduino() {
@@ -279,5 +268,34 @@ public class Hopper {
         hopper_infeed.set(0);
         shooter_infeed.set(0);
         intake_control.off();
+    }
+
+    public void errorCorrection(){
+        if(needCorrections){
+            if(!shooter_ball){
+                if(!hopper_ball_c){
+                    if(!hopper_ball_b){
+                        if(!hopper_ball_a){
+
+                        }
+                    }
+                }else{
+                    if(!hopper_ball_b){
+                        if(!hopper_ball_a){
+                            if(!intake_to_hopper_sensor){
+                                motor.hopper.set(-0.4);
+                                motor.hopper_infeed.set(-0.4);
+                            }else{
+                                motor.hopper_infeed.set(0);
+                            }
+                        }else{
+                        }
+                    }
+                }
+            }else{
+                motor.hopper.set(-0.4);
+                motor.intake.set(-0.4);
+            }
+        }
     }
 }
