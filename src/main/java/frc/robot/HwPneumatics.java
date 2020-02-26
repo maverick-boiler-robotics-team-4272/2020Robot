@@ -10,6 +10,7 @@ public class HwPneumatics {
     public boolean enabled = c.enabled();
     public boolean pressureSwitch = c.getPressureSwitchValue();
     public double current = c.getCompressorCurrent();
+    
 
     public DoubleSolenoid climberSolenoid = new DoubleSolenoid(1, 6);
     public DoubleSolenoid intakeSolenoid = new DoubleSolenoid(2, 5);

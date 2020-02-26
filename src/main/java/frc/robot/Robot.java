@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     teleop = new Teleop(this);
+    auto = new NewAuto(this);
     System.out.println("The STALLION is ready");
   }
 
@@ -49,7 +50,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    
+    motor.logNetworkTables();
   }
 
   /**

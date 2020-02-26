@@ -38,7 +38,7 @@ public class Shooter {
 
     public void sendNumbers(){
         motor.shooterVel.setNumber(SENSOR_TO_RPM * motor.shooter1.getSelectedSensorVelocity());
-        System.out.println("motor power: " + motor.shooter1.getMotorOutputPercent());
+        // System.out.println("motor power: " + motor.shooter1.getMotorOutputPercent());
         motor.shooterOutput.setNumber(motor.shooter1.getMotorOutputPercent());
     }
 

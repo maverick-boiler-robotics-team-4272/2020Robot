@@ -58,8 +58,8 @@ public class HwMotor {
     public final TalonSRX shooter2 = new TalonSRX(16);
 
     public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
-    public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(11, 11, 11);
-    
+    public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.211, 0.0295, 0.00628);
+    //Track width 62.405 units?
 
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table = inst.getTable("datatable");
@@ -155,8 +155,11 @@ public class HwMotor {
         left2.follow(left1);
         right2.follow(right1);
         right1.setInverted(true);
-        leftEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
-        rightEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
+
+        leftEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI / 60);
+        rightEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI / 60);
+        leftEncoder.setPositionConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
+        rightEncoder.setPositionConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
 
         rightPID.setOutputRange(-1, 1);
         rightPID.setP(drivekP);
@@ -170,7 +173,7 @@ public class HwMotor {
         leftPID.setFF(drivekF);
 
         drivePrekP.setDouble(0);
-        drivePrekF.setDouble(0.000093);
+        drivePrekF.setDouble(0.0);
         drivePrekI.setDouble(0);
         drivePrekD.setDouble(0);
 
@@ -181,6 +184,21 @@ public class HwMotor {
         climberRight.getEncoder().setPosition(0);
         climberLeft.setSoftLimit(SoftLimitDirection.kForward, 0);
         climberRight.setSoftLimit(SoftLimitDirection.kForward, 0);
+
+        intake.setSmartCurrentLimit(40, 20, 1000);
+        intake2.setSmartCurrentLimit(40, 20, 1000);
+
+        CPM.setSmartCurrentLimit(40);
+
+        CPM.burnFlash();
+        intake.burnFlash();
+        intake2.burnFlash();
+        climberLeft.burnFlash();
+        climberRight.burnFlash();
+        left1.burnFlash();
+        left2.burnFlash();
+        right1.burnFlash();
+        right2.burnFlash();
 
 
         table.addEntryListener("shooter_kP", new TableEntryListener() {
@@ -255,7 +273,7 @@ public class HwMotor {
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-        table.addEntryListener("rightkP", new TableEntryListener() {
+        table.addEntryListener("drivekP", new TableEntryListener() {
             @Override
             public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
                 double driveNewKP = value.getDouble();
@@ -265,7 +283,7 @@ public class HwMotor {
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-        table.addEntryListener("rightkI", new TableEntryListener() {
+        table.addEntryListener("drivekI", new TableEntryListener() {
             @Override
             public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
                 double driveNewKI = value.getDouble();
@@ -275,7 +293,7 @@ public class HwMotor {
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-        table.addEntryListener("rightkD", new TableEntryListener() {
+        table.addEntryListener("drivekD", new TableEntryListener() {
             @Override
             public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
                 double driveNewKD = value.getDouble();
@@ -285,7 +303,7 @@ public class HwMotor {
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-        table.addEntryListener("rightkF", new TableEntryListener() {
+        table.addEntryListener("drivekF", new TableEntryListener() {
             @Override
             public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
                 double driveNewKF = value.getDouble();
@@ -294,13 +312,6 @@ public class HwMotor {
             }
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-
-        intake.setSmartCurrentLimit(40, 20, 1000);
-        intake2.setSmartCurrentLimit(40, 20, 1000);
-
-        CPM.setSmartCurrentLimit(40);
-        
     }
 
     public void logNetworkTables(){
@@ -315,11 +326,13 @@ public class HwMotor {
     public void setLeftVelocity(double rpmSetpoint, double feedforward){
         leftPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
         leftDriveVelSetpoint.setNumber(rpmSetpoint);
+        System.out.println("left speed: " + rpmSetpoint + "\n left FF: " + feedforward);
     }
 
     public void setRightVelocity(double rpmSetpoint, double feedforward){
         rightPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
         rightDriveVelSetpoint.setNumber(rpmSetpoint);
+        System.out.println("right speed: " + rpmSetpoint + "\n right FF: " + feedforward);
     }
 
     public void climberExtend(double power){

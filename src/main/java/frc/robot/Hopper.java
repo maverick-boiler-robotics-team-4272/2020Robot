@@ -106,12 +106,12 @@ public class Hopper {
                     shooter_infeed.set(shooter_feeder_wheel);
                     hopper_infeed.set(0);
                     hopper.set(belt_speed);
-                    intake_control.off();
+                    // intake_control.off();
                 } else {
                     shooter_infeed.set(shooter_feeder_wheel);
                     hopper_infeed.set(belt_speed);
                     hopper.set(belt_speed);
-                    intake_control.on();
+                    // intake_control.on();
                 }
             } else {
                 if (intake_to_hopper_sensor) {
@@ -121,36 +121,36 @@ public class Hopper {
                                 shooter_infeed.set(0);
                                 hopper_infeed.set(belt_speed);
                                 hopper.set(belt_speed);
-                                intake_control.on();
+                                // intake_control.on();
                             } else {
                                 shooter_infeed.set(0);
                                 hopper_infeed.set(belt_speed);
                                 hopper.set(belt_speed);
-                                intake_control.on();
+                                // intake_control.on();
                             }
                         } else {
                             shooter_infeed.set(0);
                             hopper_infeed.set(belt_speed);
                             hopper.set(belt_speed);
-                            intake_control.on();
+                            // intake_control.on();
                         }
                     } else {
                         shooter_infeed.set(0);
                         hopper_infeed.set(0);
                         hopper.set(0);
-                        intake_control.off();
+                        // intake_control.off();
                     }
                 } else {
                     if (hopper_ball_a || hopper_ball_b || hopper_ball_c) {
                         shooter_infeed.set(0);
                         hopper_infeed.set(belt_speed);
                         hopper.set(0);
-                        intake_control.on();
+                        // intake_control.on();
                     } else {
                         shooter_infeed.set(0);
                         hopper_infeed.set(belt_speed);
                         hopper.set(belt_speed);
-                        intake_control.on();
+                        // intake_control.on();
                     }
                 }
             }
@@ -258,16 +258,18 @@ public class Hopper {
             shooter_ball = false;
         }
 
+        /*
         System.out.println("intake_to_hopper_sensor : " + intake_to_hopper_sensor + "\n hopper_ball_a : "
                 + hopper_ball_a + "\n hopper_ball_b : " + hopper_ball_b + "\n hopper_ball_c : " + hopper_ball_c
                 + "\n shooter_ball : " + shooter_ball);
+        */
     }
 
     public void disable() {
         hopper.set(0);
         hopper_infeed.set(0);
         shooter_infeed.set(0);
-        intake_control.off();
+        // intake_control.off();
     }
 
     public void errorCorrection(){
