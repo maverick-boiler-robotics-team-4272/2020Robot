@@ -43,17 +43,16 @@ public class ColorThing {
   private int r_itr = 10; 
   private int rotations = 8;
   private String current_color;
-  private HwMotor motor;
   private boolean is_spinning;
 
-  public ColorThing(HwMotor motor) {
+  public ColorThing(Robot robot) {
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);
     m_colorMatcher.addColorMatch(kFakeYellowTarget);
     m_colorMatcher.addColorMatch(kFakeGreenTarget);
-    this.motor = motor;
+    this.robot = robot;
     is_spinning = false;
   }
 
@@ -127,9 +126,9 @@ public class ColorThing {
     }
     
     if(/*is_spinning*/reset){
-       motor.CPM.set(1);
+       robot.motor.CPM.set(0.3);
      } else {
-      motor.CPM.set(0);
+      robot.motor.CPM.set(0);
      }
   }
 
@@ -155,27 +154,27 @@ public class ColorThing {
 
     if(color == "Yellow"){
       if(colorString != "Green"){
-        motor.CPM.set(0.3);
+        robot.motor.CPM.set(0.3);
       }else{
-        motor.CPM.set(0);
+        robot.motor.CPM.set(0);
       }
     }else if(color == "Blue"){
       if(colorString != "Red"){
-        motor.CPM.set(0.3);
+        robot.motor.CPM.set(0.3);
       }else{
-        motor.CPM.set(0);
+        robot.motor.CPM.set(0);
       }
     }else if(color == "Red"){
       if(colorString != "Blue"){
-        motor.CPM.set(0.3);
+        robot.motor.CPM.set(0.3);
       }else{
-        motor.CPM.set(0);
+        robot.motor.CPM.set(0);
       }
     }else if(color == "Green"){
       if(colorString != "Yellow"){ // this was == not !=
-        motor.CPM.set(0.3);
+        robot.motor.CPM.set(0.3);
       }else{
-        motor.CPM.set(0);
+        robot.motor.CPM.set(0);
       }
     }
   }

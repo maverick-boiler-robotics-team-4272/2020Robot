@@ -34,6 +34,7 @@ import com.revrobotics.CANPIDController;
  * Add your docs here.
  */
 public class HwMotor {
+    Robot robot;
     public final CANSparkMax left1 = new CANSparkMax(1, MotorType.kBrushless);
     public final CANSparkMax left2 = new CANSparkMax(2, MotorType.kBrushless);
     public final CANEncoder leftEncoder = left1.getEncoder();
@@ -108,7 +109,8 @@ public class HwMotor {
 
 
 
-    public HwMotor() {
+    public HwMotor(Robot robot) {
+        this.robot = robot;
         shooter2.follow(shooter1);
         shooter2.setInverted(InvertType.OpposeMaster);
         shooter1.setSensorPhase(true);
@@ -132,10 +134,10 @@ public class HwMotor {
         // shooter2.configVoltageCompSaturation(12);
         shooter1.enableVoltageCompensation(true);
         
-        pre_kP.setDouble(0.25);
-        pre_kF.setDouble(0.014);
-        pre_kI.setDouble(0.001);
-        pre_kD.setDouble(0.08);
+        pre_kP.setDouble(0.15);
+        pre_kI.setDouble(0.005);
+        pre_kD.setDouble(0.0114);
+        pre_kF.setDouble(0.0101);
 
         
         intakePID = intake.getPIDController();
@@ -309,6 +311,16 @@ public class HwMotor {
                 double driveNewKF = value.getDouble();
                 rightPID.setFF(driveNewKF);
                 leftPID.setFF(driveNewKF);
+            }
+            
+        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+        table.addEntryListener("targetVeloc", new TableEntryListener() {
+            @Override
+            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
+                double TargetVeloc = value.getDouble();
+                robot.teleop.rpm = TargetVeloc;
+                System.out.println("new target velocity: " + TargetVeloc);
             }
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);

@@ -33,8 +33,7 @@ public class Hopper {
 
     int num_balls_in_hopper = 0;
 
-    HwMotor motor;
-    Intake intake_control;
+    Robot robot;
 
     CANSparkMax hopper_infeed;
     CANSparkMax hopper;
@@ -46,12 +45,11 @@ public class Hopper {
 
     double rpm;
 
-    public Hopper(HwMotor motor, Intake intake) {
-        this.motor = motor;
-        hopper_infeed = motor.hopper_infeed;
-        hopper = motor.hopper;
-        shooter_infeed = motor.miniShooter;
-        this.intake_control = intake;
+    public Hopper(Robot robot) {
+        this.robot = robot;
+        hopper_infeed = robot.motor.hopper_infeed;
+        hopper = robot.motor.hopper;
+        shooter_infeed = robot.motor.miniShooter;
     }
     
 
@@ -155,7 +153,7 @@ public class Hopper {
                 }
             }
         } else {
-            if (motor.shooter1.getSelectedSensorVelocity() >= lowerDifference && motor.shooter1.getSelectedSensorVelocity() <= upperDifference){
+            if (robot.motor.shooter1.getSelectedSensorVelocity() >= lowerDifference && robot.motor.shooter1.getSelectedSensorVelocity() <= upperDifference){
                 shooter_infeed.set(-1);
                 hopper_infeed.set(-0.2);
                 hopper.set(-0.2);
@@ -285,18 +283,18 @@ public class Hopper {
                     if(!hopper_ball_b){
                         if(!hopper_ball_a){
                             if(!intake_to_hopper_sensor){
-                                motor.hopper.set(-0.4);
-                                motor.hopper_infeed.set(-0.4);
+                                robot.motor.hopper.set(-0.4);
+                                robot.motor.hopper_infeed.set(-0.4);
                             }else{
-                                motor.hopper_infeed.set(0);
+                                robot.motor.hopper_infeed.set(0);
                             }
                         }else{
                         }
                     }
                 }
             }else{
-                motor.hopper.set(-0.4);
-                motor.intake.set(-0.4);
+                robot.motor.hopper.set(-0.4);
+                robot.motor.intake.set(-0.4);
             }
         }
     }

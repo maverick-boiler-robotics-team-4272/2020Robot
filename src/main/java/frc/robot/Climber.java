@@ -3,17 +3,17 @@ package frc.robot;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 
 public class Climber{
-    private HwPneumatics pneumatics;
-    public Climber(HwPneumatics pneumatics){
-        this.pneumatics = pneumatics;
+    Robot robot;
+    public Climber(Robot robot){
+        this.robot = robot;
     }
     public void off(){
-        pneumatics.climberSolenoid.set(kOff);
+        robot.pneumatics.climberSolenoid.set(kOff);
     }
     public void up(){
-        pneumatics.climberSolenoid.set(kForward);
+        robot.pneumatics.climberSolenoid.set(kForward);
     }
     public void down(){
-        pneumatics.climberSolenoid.set(kReverse);
+        robot.pneumatics.climberSolenoid.set(kReverse);
     }
 }

@@ -49,7 +49,7 @@ public class Camera {
     public void updateLimelightTracking(){
         final double STEER_K = 0.005;//We'll worry about these numbers later
         final double DRIVE_K = -0.26;
-        final double DESIRED_TARGET_AREA = 1.5;
+        final double DESIRED_TARGET_Y = -7;
         final double MAX_DRIVE = 0.1;
 
         /*Didn't know what these things meant so yee.
@@ -65,9 +65,10 @@ public class Camera {
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
         double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-        //double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-        double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+        double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+        //double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
 
+        // System.out.println("tv="+tv);
         if(tv < 1.0){
             m_LimelightHasValidTarget = false;
             m_LimelightDriveCommand = 0;
@@ -82,7 +83,8 @@ public class Camera {
         m_LimelightSteerCommand = steer_cmd;
 
         // try to drive forward until the target area reaches our desired area
-        double drive_cmd = (DESIRED_TARGET_AREA - ta) * DRIVE_K;
+        // double drive_cmd = (DESIRED_TARGET_Y - ty) * DRIVE_K;
+        double drive_cmd = 0;
 
         // don't let the robot drive too fast into the goal
         if (drive_cmd > MAX_DRIVE)

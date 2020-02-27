@@ -22,9 +22,9 @@ public class Teleop {
     }
     boolean is_auto = false;
     double percentOutput = 0;
-    private double rpm = 3600;
+    public double rpm = 3600;
     boolean shootActive = false;
-    private boolean climber_current_pos = false; // false is retracted true is extended
+    //private boolean climber_current_pos = false; // false is retracted true is extended
     public static boolean colorSelectionTime = false;
     boolean is_reversing = false;
 

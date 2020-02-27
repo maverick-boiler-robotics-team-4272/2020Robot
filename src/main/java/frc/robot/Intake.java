@@ -4,29 +4,26 @@ import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import com.revrobotics.ControlType;
 
 public class Intake{
-    private HwPneumatics pneumatics;
-    private HwMotor motor;
-    private double intake_speed = 0.4;
-    public Intake(HwPneumatics pneumatics, HwMotor motor){
-        this.pneumatics = pneumatics;
-        this.motor = motor;
+    Robot robot;
+    public Intake(Robot robot){
+        this.robot = robot;
     }
     public void off(){
-        // pneumatics.intakeSolenoid.set(kOff);
-        motor.intake.set(0);
+        robot.pneumatics.intakeSolenoid.set(kOff);
+        robot.motor.intake.set(0);
     }
     public void out(double speed){
-        // pneumatics.intakeSolenoid.set(kForward);
-        motor.intake.set(speed);
-        motor.intake2.set(-speed);
+        robot.pneumatics.intakeSolenoid.set(kForward);
+        robot.motor.intake.set(speed);
+        robot.motor.intake2.set(-speed);
     }
     public void in(){
-        // pneumatics.intakeSolenoid.set(kReverse);
-        motor.intake.set(0);
-        motor.intake2.set(0);
+        robot.pneumatics.intakeSolenoid.set(kReverse);
+        robot.motor.intake.set(0);
+        robot.motor.intake2.set(0);
     }
     public void on(){
-        motor.intakePID.setReference(4000, ControlType.kVelocity);
-        //motor.intake.set(0.4);
+        robot.motor.intakePID.setReference(4000, ControlType.kVelocity);
+        //robot.motor.intake.set(0.4);
     }
 }

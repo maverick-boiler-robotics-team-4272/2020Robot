@@ -18,16 +18,16 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Teleop teleop;
-  public HwJoystick jstick = new HwJoystick();
-  public Camera camera = new Camera();
-  public HwMotor motor = new HwMotor();
-  public Shooter shooter = new Shooter(motor);
-  public HwPneumatics pneumatics = new HwPneumatics();
-  public Climber climber = new Climber(pneumatics);
-  public Intake intake = new Intake(pneumatics, motor);
-  public ColorThing color = new ColorThing(motor);
-  public Hopper hopper = new Hopper(motor, intake);
+  public Teleop teleop;
+  public HwJoystick jstick;
+  public Camera camera;
+  public HwMotor motor;
+  public Shooter shooter;
+  public HwPneumatics pneumatics;
+  public Climber climber;
+  public Intake intake;
+  public ColorThing color;
+  public Hopper hopper;
   public NewAuto auto;
   /**
    * This function is run when the robot is first started up and should be
@@ -37,7 +37,15 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     teleop = new Teleop(this);
     auto = new NewAuto(this);
-    System.out.println("The STALLION is ready");
+    motor = new HwMotor(this);
+    jstick = new HwJoystick();
+    camera = new Camera();
+    shooter = new Shooter(this);
+    pneumatics = new HwPneumatics();
+    climber = new Climber(this);
+    intake = new Intake(this);
+    color = new ColorThing(this);
+    hopper = new Hopper(this);
   }
 
   /**
