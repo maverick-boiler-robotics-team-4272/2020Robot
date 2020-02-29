@@ -7,82 +7,67 @@
 
 package frc.robot;
 
-// import edu.wpi.first.wpilibj.TimedRobot;
-// import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj.VictorSP;
-// import edu.wpi.first.wpilibj.SpeedControllerGroup;
-// import edu.wpi.first.wpilibj.GenericHID.Hand;
-// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.networktables.*;
 /**
  * Add your docs here.
  */
 public class Camera {
+
+    //variables for limelight aiming
     public boolean m_LimelightHasValidTarget = false;
-    public double m_LimelightDriveCommand = 0.0;
+    public double m_LimelightDriveCommand = 0.0;// never move forewards or backwards
     public double m_LimelightSteerCommand = 0.0;
-    int ledType = 1;
+
 
     public void changingLed(boolean on){
+        //defalt setting for limelight network table led activation 1 being off and 3 being on
         int numero = 3;
         if(on){
+            //turn light on
             numero = 3;
         }else{
+            //turn light off
             numero = 1;
         }
+        //publish led status to limelight network table
         NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(numero);
         
     }
-    public void changingPipeline(double number){
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(number);
-    }
     public void updateLimelightTracking(){
-        final double STEER_K = 0.005;//We'll worry about these numbers later
-        final double DRIVE_K = -0.26;
-        final double DESIRED_TARGET_Y = -7;
-        final double MAX_DRIVE = 0.1;
+        final double STEER_K = 0.005; // max speed the robot should turn
+        final double DRIVE_K = -0.26; // the feed foreward for the robot drive
+        final double DESIRED_TARGET_Y = -7; // the target y value given from limelight
+        final double MAX_DRIVE = 0.1; // max speed the robot should drive
 
-        /*Didn't know what these things meant so yee.
 
-        tv Whether the limelight has any valid targets (0 or 1)
+        //getting current network table entries
 
-        tx Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
-
-        ty Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees)
-
-        ta Target Area (0% of image to 100% of image)
-        */
-
+        //found target (1 for found, 0 for not found)
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+
+        //x degrees from center of found target
         double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+
+        //y degrees from center of found target
         double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-        //double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+        //end network table section
 
-        // System.out.println("tv="+tv);
+
+        //test if the limelight has found a target
         if(tv < 1.0){
-            m_LimelightHasValidTarget = false;
-            m_LimelightDriveCommand = 0;
-            m_LimelightSteerCommand = 0;
-            return;
+            m_LimelightHasValidTarget = false; //does not have a target
+            m_LimelightDriveCommand = 0; //dont go anywhere
+            m_LimelightSteerCommand = 0; //dont go anywhere
+            return; //stop executing the function
         }
 
-        m_LimelightHasValidTarget = true;
+        m_LimelightHasValidTarget = true; //has a valid target
 
-        // Start with proportional steering
-        double steer_cmd = tx * STEER_K;
-        m_LimelightSteerCommand = steer_cmd;
 
-        System.out.println("tx=" + tx + " tv=" + tv + " steercmd=" + steer_cmd);
-        // try to drive forward until the target area reaches our desired area
-        // double drive_cmd = (DESIRED_TARGET_Y - ty) * DRIVE_K;
-        double drive_cmd = 0;
+        double steer_cmd = tx * STEER_K; //how fast it should steer
+        m_LimelightSteerCommand = steer_cmd; // puts the above into an other more different variable
 
-        // don't let the robot drive too fast into the goal
-        if (drive_cmd > MAX_DRIVE)
-        {
-          drive_cmd = MAX_DRIVE;
-        }
-        m_LimelightDriveCommand = drive_cmd;        
+
+   
     }
 }
