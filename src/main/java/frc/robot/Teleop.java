@@ -184,10 +184,10 @@ public class Teleop {
         robot.hopper.loop(rpm);
         robot.shooter.sendNumbers();
         robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);
-        robot.motor.ball2.setBoolean(robot.hopper.prev_intake_to_hopper_sensor);
-        robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_a);
-        robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_b);
-        robot.motor.ball5.setBoolean(robot.hopper.hopper_ball_c);
+        robot.motor.ball2.setBoolean(robot.hopper.hopper_ball_a);
+        robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_b);
+        robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_c);
+        robot.motor.ball5.detBoolean(robot.hopper.shooter_ball);
     }
 
     public void drive(double leftPower, double rightPower) {
