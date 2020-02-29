@@ -95,8 +95,8 @@ public class Hopper {
 
     public void movement(boolean shoot_button, boolean reverse) {
         // readArduino();
-        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.1;
-        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.9;
+        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.05;
+        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.95;
         //if(!reverse){
         if (!shoot_button) {
             if (!shooter_ball) {
@@ -276,25 +276,28 @@ public class Hopper {
                 if(!hopper_ball_c){
                     if(!hopper_ball_b){
                         if(!hopper_ball_a){
-
-                        }
-                    }
-                }else{
-                    if(!hopper_ball_b){
-                        if(!hopper_ball_a){
-                            if(!intake_to_hopper_sensor){
-                                robot.motor.hopper.set(-0.4);
-                                robot.motor.hopper_infeed.set(-0.4);
-                            }else{
-                                robot.motor.hopper_infeed.set(0);
+                            if(!prev_intake_to_hopper_sensor){
+                                disable();
                             }
                         }else{
+                            robot.motor.hopper.set(0.2);
                         }
+                    }else{
+                        robot.motor.hopper.set(0.2);
                     }
+                }else if(!hopper_ball_b && hopper_ball_a){
+                    robot.motor.hopper.set(0.2);
+                }else{
+                    disable();
                 }
-            }else{
-                robot.motor.hopper.set(-0.4);
-                robot.motor.intake.set(-0.4);
+            }else if(!hopper_ball_a || !hopper_ball_b || !hopper_ball_c){
+                if(!prev_intake_to_hopper_sensor){
+                    robot.motor.hopper_infeed.set(-0.2);
+                }else{
+                    robot.motor.hopper_infeed.set(0);
+                }
+                robot.motor.hopper.set(-0.2);
+                robot.motor.miniShooter.set(-0.2);
             }
         }
     }

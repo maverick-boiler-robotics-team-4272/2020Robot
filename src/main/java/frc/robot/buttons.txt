@@ -33,7 +33,8 @@ xbox controller:
         x button pressed does intake/hopper cool stuff
 
         right trigger with other buttons:
-            a pressed CPM manual movement
-            x pressed = set color to blue for third stage in color wheel*/
+            a pressed
+            x pressed = color position
             b pressed CPM pneumatics
+            y pressed Climber pneumatics
            

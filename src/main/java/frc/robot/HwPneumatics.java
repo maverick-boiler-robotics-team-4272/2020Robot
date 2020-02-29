@@ -20,19 +20,26 @@ public class HwPneumatics {
         c.setClosedLoopControl(true);
         climberSolenoid.set(DoubleSolenoid.Value.kForward);
         intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
-        CPMSolenoid.set(DoubleSolenoid.Value.kReverse);
+        CPMSolenoid.set(DoubleSolenoid.Value.kForward);
         extra.set(false);
+    }
+    public void compressor(){
+        if(c.getClosedLoopControl()){
+            c.setClosedLoopControl(false);
+        }else{
+            c.setClosedLoopControl(true);
+        }
     }
 
     boolean climberUp = false;
     public void climberPneumatics(boolean up){
         if(up){
             if(climberUp){
-                climberSolenoid.set(DoubleSolenoid.Value.kForward);
+                climberSolenoid.set(DoubleSolenoid.Value.kReverse);
                 extra.set(false);
                 climberUp = false;
             }else{
-                climberSolenoid.set(DoubleSolenoid.Value.kReverse);
+                climberSolenoid.set(DoubleSolenoid.Value.kForward);
                 extra.set(true);
                 climberUp = true;
             }
@@ -43,10 +50,10 @@ public class HwPneumatics {
     public void CPMPneumatics(boolean up){
         if(up){
             if(CPMUp){
-                CPMSolenoid.set(DoubleSolenoid.Value.kForward);
+                CPMSolenoid.set(DoubleSolenoid.Value.kReverse);
                 CPMUp = false;
             }else{
-                CPMSolenoid.set(DoubleSolenoid.Value.kReverse);
+                CPMSolenoid.set(DoubleSolenoid.Value.kForward);
                 CPMUp = true;
             }
         }

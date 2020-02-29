@@ -113,8 +113,7 @@ public class HwMotor {
         this.robot = robot;
         shooter2.follow(shooter1);
         shooter2.setInverted(InvertType.OpposeMaster);
-        shooter1.setSensorPhase(true);
-        shooter2.setSensorPhase(true);
+        shooter1.setSensorPhase(false);
         shooter1.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms);
         shooter1.configVelocityMeasurementWindow(16);
         shooter1.setInverted(false);

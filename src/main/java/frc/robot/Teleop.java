@@ -22,7 +22,7 @@ public class Teleop {
     }
     boolean is_auto = false;
     double percentOutput = 0;
-    public double rpm = 3600;
+    public double rpm = 4000;
     boolean shootActive = false;
     //private boolean climber_current_pos = false; // false is retracted true is extended
     public static boolean colorSelectionTime = false;
@@ -97,15 +97,15 @@ public class Teleop {
             robot.camera.changingPipeline();
         }
 
-        // if (robot.jstick.xbox.getYButtonPressed()) {
-        //     if (climber_current_pos) {
-        //         climber_current_pos = false;
-        //         robot.climber.up();
-        //     } else {
-        //         climber_current_pos = true;
-        //         robot.climber.down();
-        //     }
-        // }
+         if (robot.jstick.xbox.getYButtonPressed()) {
+             if (climber_current_pos) {
+                 climber_current_pos = false;
+                 robot.climber.up();
+             } else {
+                 climber_current_pos = true;
+                 robot.climber.down();
+             }
+         }
 
         // manually run the intake
         robot.hopper.readArduino(); // update sensor values
@@ -117,10 +117,13 @@ public class Teleop {
             //is_reversing = true;
             robot.hopper.reverse_balls();
             shootActive = false;
+            robot.hopper.needCorrections = true;
+            robot.hopper.errorCorrection();
         }
 
         if(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15){
-            robot.hopper.movement(false, false);
+            //robot.hopper.movement(false, false);
+            robot.hopper.intake_balls();
             if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15){
                 robot.intake.out((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15);
             }else{
@@ -131,14 +134,18 @@ public class Teleop {
             robot.intake.in();
         }
 
+        // if(robot.jstick.xbox.getStartButton()){
+        //     robot.motor.intake.set(0.4);
+        //     robot.motor.hopper_infeed.set(0.4);
+        //     robot.motor.hopper.set(0.4);
+        // }else if(robot.jstick.xbox.getStartButtonReleased()){
+        //     robot.motor.intake.set(0);
+        //     robot.motor.hopper_infeed.set(0);
+        //     robot.motor.hopper.set(0);
+        // }
+
         if(robot.jstick.xbox.getStartButton()){
-            robot.motor.intake.set(0.4);
-            robot.motor.hopper_infeed.set(0.4);
-            robot.motor.hopper.set(0.4);
-        }else if(robot.jstick.xbox.getStartButtonReleased()){
-            robot.motor.intake.set(0);
-            robot.motor.hopper_infeed.set(0);
-            robot.motor.hopper.set(0);
+            robot.pneumatics.compressor();
         }
         
         if (robot.jstick.xbox.getTriggerAxis(Hand.kRight) > 0.2) {
