@@ -23,28 +23,19 @@ public class Camera {
     public double m_LimelightDriveCommand = 0.0;
     public double m_LimelightSteerCommand = 0.0;
     int ledType = 1;
-    int PipelineNum = 3;
-    public void changingLed(){
-        if(ledType == 1){
-            ledType = 3;
+
+    public void changingLed(boolean on){
+        int numero = 3;
+        if(on){
+            numero = 3;
+        }else{
+            numero = 1;
         }
-        else if(ledType == 3){
-            ledType = 1;
-        }
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(ledType);
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(numero);
         
     }
-    public void changingPipeline(){
-        if(PipelineNum == 2){
-            PipelineNum = 3;
-        }
-        else if(PipelineNum == 3){
-            PipelineNum = 2;
-        }
-        else if(PipelineNum == 1){
-            PipelineNum = 3;
-        }
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(PipelineNum);
+    public void changingPipeline(double number){
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(number);
     }
     public void updateLimelightTracking(){
         final double STEER_K = 0.005;//We'll worry about these numbers later
@@ -72,7 +63,7 @@ public class Camera {
         if(tv < 1.0){
             m_LimelightHasValidTarget = false;
             m_LimelightDriveCommand = 0;
-            m_LimelightSteerCommand = 0.3;
+            m_LimelightSteerCommand = 0;
             return;
         }
 
@@ -82,6 +73,7 @@ public class Camera {
         double steer_cmd = tx * STEER_K;
         m_LimelightSteerCommand = steer_cmd;
 
+        System.out.println("tx=" + tx + " tv=" + tv + " steercmd=" + steer_cmd);
         // try to drive forward until the target area reaches our desired area
         // double drive_cmd = (DESIRED_TARGET_Y - ty) * DRIVE_K;
         double drive_cmd = 0;

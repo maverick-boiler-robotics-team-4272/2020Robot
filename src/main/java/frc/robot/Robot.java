@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     motor.logNetworkTables();
+    hopper.update_tables();
   }
 
   /**

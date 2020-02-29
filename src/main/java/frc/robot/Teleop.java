@@ -24,9 +24,11 @@ public class Teleop {
     double percentOutput = 0;
     public double rpm = 4000;
     boolean shootActive = false;
-    //private boolean climber_current_pos = false; // false is retracted true is extended
+    private boolean climber_current_pos = false; // false is retracted true is extended
     public static boolean colorSelectionTime = false;
     boolean is_reversing = false;
+
+    boolean current_intake_pos = false; //false is retracted
 
     // public static boolean reversing = false;
 
@@ -59,26 +61,29 @@ public class Teleop {
         }
 
 
-        if (leftSpeed > 0){
+        if (leftSpeed > 0) {
             leftSpeed *= leftSpeed;
         }else{
             leftSpeed *= -1 * leftSpeed;
         }
 
-        if (rightSpeed > 0){
+        if (rightSpeed > 0) {
             rightSpeed *= rightSpeed;
         }else{
             rightSpeed *= -1 * rightSpeed;
         }
-        robot.camera.updateLimelightTracking();
-
+        
         if (robot.jstick.leftJoystick.getTrigger()) {
+            robot.camera.updateLimelightTracking();
             leftSpeed = robot.camera.m_LimelightDriveCommand - robot.camera.m_LimelightSteerCommand;
             rightSpeed = robot.camera.m_LimelightDriveCommand + robot.camera.m_LimelightSteerCommand;
-            drive(leftSpeed, rightSpeed);
-        } else {
-            drive(leftSpeed, rightSpeed);
+            robot.camera.changingLed(true);
+        }else if(robot.jstick.leftJoystick.getTriggerReleased()){
+            // robot.camera.changingPipeline(1);
+            robot.camera.changingLed(false);
         }
+
+        drive(leftSpeed, rightSpeed);
 
         // if (Math.abs(robot.jstick.xbox.getY(Hand.kLeft)) > 0.5) {
         //     rpm -= 10 * robot.jstick.xbox.getY(Hand.kLeft);
@@ -91,47 +96,32 @@ public class Teleop {
         }
 
         if (robot.jstick.xbox.getBumperPressed(Hand.kLeft)) {
-            robot.camera.changingLed();
-        }
-        if (robot.jstick.xbox.getBumperPressed(Hand.kRight)) {
-            robot.camera.changingPipeline();
+            //robot.camera.changingPipeline();
+            robot.intake.on(0.4);
+            robot.hopper.intake_balls();
         }
 
-         if (robot.jstick.xbox.getYButtonPressed()) {
-             if (climber_current_pos) {
-                 climber_current_pos = false;
-                 robot.climber.up();
-             } else {
-                 climber_current_pos = true;
-                 robot.climber.down();
-             }
-         }
-
-        // manually run the intake
-        robot.hopper.readArduino(); // update sensor values
         if (robot.jstick.rightJoystick.getTriggerPressed()) {
             robot.hopper.shoot_balls();
             shootActive = true;
             //is_reversing = false;
-        } else if(robot.jstick.rightJoystick.getTriggerReleased()&&!is_reversing){
+        } else if(robot.jstick.rightJoystick.getTriggerReleased() /* && !is_reversing*/) {
             //is_reversing = true;
-            robot.hopper.reverse_balls();
+            robot.hopper.stop_hopper();
             shootActive = false;
-            robot.hopper.needCorrections = true;
-            robot.hopper.errorCorrection();
         }
 
-        if(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15){
-            //robot.hopper.movement(false, false);
+        if(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15) {
             robot.hopper.intake_balls();
-            if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15){
-                robot.intake.out((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15);
-            }else{
-                robot.intake.out(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) - 0.15);
+
+            if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15) {
+                robot.intake.on(((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15) * 0.75);
+            }else {
+                robot.intake.on((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) - 0.15) * 0.75);
             }
         } else {
-            robot.hopper.disable();
-            robot.intake.in();
+            robot.hopper.stop_intaking();
+            robot.intake.off();
         }
 
         // if(robot.jstick.xbox.getStartButton()){
@@ -144,15 +134,29 @@ public class Teleop {
         //     robot.motor.hopper.set(0);
         // }
 
-        if(robot.jstick.xbox.getStartButton()){
+        if(robot.jstick.xbox.getStartButton()) {
             robot.pneumatics.compressor();
+        }
+
+        if(robot.jstick.xbox.getBackButton()) {
+            robot.hopper.reverse_hopper();
+            robot.intake.on(-0.5);
+        }
+        if(robot.jstick.xbox.getBackButtonReleased()) {
+            robot.hopper.stop_hopper();
+            robot.intake.off();
         }
         
         if (robot.jstick.xbox.getTriggerAxis(Hand.kRight) > 0.2) {
             
             if(robot.jstick.xbox.getAButtonPressed()) {
-                robot.pneumatics.intakePneumatics(true);
-                // robot.motor.CPM.set(0.5);
+                if(current_intake_pos){
+                    robot.intake.in();
+                    current_intake_pos = false;
+                }else{
+                    robot.intake.out();
+                    current_intake_pos = true;
+                }
             }
             if (robot.jstick.xbox.getBButtonPressed()) {
                 robot.pneumatics.CPMPneumatics(true);
@@ -176,6 +180,7 @@ public class Teleop {
             robot.motor.climberLeft.set(0);
         }
 
+        robot.hopper.readArduino(); // update sensor values
         robot.hopper.loop(rpm);
         robot.shooter.sendNumbers();
         robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);

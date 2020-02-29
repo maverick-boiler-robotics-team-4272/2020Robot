@@ -13,19 +13,19 @@ public class Intake{
     public void off(){
         robot.pneumatics.intakeSolenoid.set(kOff);
         robot.motor.intake.set(0);
+        robot.motor.intake2.set(0);
     }
-    public void out(double speed){
+    public void out(){
         robot.pneumatics.intakeSolenoid.set(kReverse);
-        robot.motor.intake.set(speed);
-        robot.motor.intake2.set(-speed);
     }
     public void in(){
         robot.pneumatics.intakeSolenoid.set(kForward);
         robot.motor.intake.set(0);
         robot.motor.intake2.set(0);
     }
-    public void on(){
-        robot.motor.intakePID.setReference(4000, ControlType.kVelocity);
-        //robot.motor.intake.set(0.4);
+    public void on(double speed){
+        //robot.motor.intakePID.setReference(4000, ControlType.kVelocity);
+        robot.motor.intake.set(speed);
+        robot.motor.intake2.set(-speed);
     }
 }

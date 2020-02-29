@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 
 //import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Hopper {
     // public DigitalInput intake_sense = new DigitalInput(0);
@@ -26,6 +27,7 @@ public class Hopper {
     public boolean is_shooting = false;
     public boolean is_intaking = false;
     public boolean is_stopping = false;
+    public boolean is_reversing = false;
 
     // private I2C Wire;
     // private static final int MAX_BYTES = 32;
@@ -42,6 +44,8 @@ public class Hopper {
     double shooter_feeder_wheel = -0.4;
     boolean intakeSwitch = true;
     public boolean needCorrections = false;
+
+    private double current_intake_time = 0;
 
     double rpm;
 
@@ -60,10 +64,28 @@ public class Hopper {
             movement(false, false);
         } else if(is_stopping){
             //movement(false, true);
+        } else if(is_reversing) {
+            hopper_infeed.set(-1 * belt_speed);
+            hopper.set(-1 * belt_speed);
+            shooter_infeed.set(-1 * shooter_feeder_wheel / 2);
         } else {
             disable();
         }
         this.rpm = rpm;
+        if(!is_shooting || !is_intaking){
+            if(Timer.getFPGATimestamp() - current_intake_time >= 1){
+                stop_hopper();
+            }
+        }
+    }
+
+    public void update_tables(){
+        robot.hopper.readArduino(); // update sensor values
+        robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);
+        robot.motor.ball2.setBoolean(robot.hopper.prev_intake_to_hopper_sensor);
+        robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_a);
+        robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_b);
+        robot.motor.ball5.setBoolean(robot.hopper.hopper_ball_c);
     }
 
     //the below functions are to make sure loop does not break and so teleop can call it
@@ -71,29 +93,35 @@ public class Hopper {
         is_shooting = true;
         is_intaking = false;
         is_stopping = false;
+        is_reversing = false;
     }
 
     public void intake_balls(){
         is_shooting = false;
         is_intaking = true;
         is_stopping = false;
+        is_reversing = false;
     }
 
-    public void reverse_balls(){
-        is_shooting = false;
-        is_intaking = false;
-        is_stopping = true;
-    }
-
-    public void stop_hopper(){
+    public void stop_hopper() {
         is_shooting = false;
         is_intaking = false;
         is_stopping = false;
+        is_reversing = false;
     }
 
-    
+    public void reverse_hopper() {
+        is_shooting = false;
+        is_intaking = false;
+        is_stopping = false;
+        is_reversing = true;
+    }
 
-    public void movement(boolean shoot_button, boolean reverse) {
+    public void stop_intaking(){
+        current_intake_time = Timer.getFPGATimestamp();
+    }
+
+    private void movement(boolean shoot_button, boolean reverse) {
         // readArduino();
         double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.05;
         double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.95;
@@ -263,14 +291,14 @@ public class Hopper {
         */
     }
 
-    public void disable() {
+    private void disable() {
         hopper.set(0);
         hopper_infeed.set(0);
         shooter_infeed.set(0);
         // intake_control.off();
     }
 
-    public void errorCorrection(){
+    private void errorCorrection(){
         if(needCorrections){
             if(!shooter_ball){
                 if(!hopper_ball_c){

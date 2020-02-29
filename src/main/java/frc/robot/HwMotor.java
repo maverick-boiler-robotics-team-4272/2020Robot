@@ -157,10 +157,10 @@ public class HwMotor {
         right2.follow(right1);
         right1.setInverted(true);
 
-        leftEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI / 60);
-        rightEncoder.setVelocityConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI / 60);
-        leftEncoder.setPositionConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
-        rightEncoder.setPositionConversionFactor((9/84) * Units.inchesToMeters(6) * Math.PI);
+        leftEncoder.setVelocityConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI / 60) / 42);
+        rightEncoder.setVelocityConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI / 60) / 42);
+        leftEncoder.setPositionConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI) / 42);
+        rightEncoder.setPositionConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI) / 42);
 
         rightPID.setOutputRange(-1, 1);
         rightPID.setP(drivekP);
@@ -183,19 +183,34 @@ public class HwMotor {
         // climberLeft.setInverted(true);
         climberLeft.getEncoder().setPosition(0);
         climberRight.getEncoder().setPosition(0);
-        climberLeft.setSoftLimit(SoftLimitDirection.kForward, 0);
-        climberRight.setSoftLimit(SoftLimitDirection.kForward, 0);
+        climberLeft.setSoftLimit(SoftLimitDirection.kForward, 20);
+        climberRight.setSoftLimit(SoftLimitDirection.kForward, 20);
 
         intake.setSmartCurrentLimit(40, 20, 1000);
         intake2.setSmartCurrentLimit(40, 20, 1000);
+        
+        miniShooter.setSmartCurrentLimit(30);
+        hopper.setSmartCurrentLimit(30);
+        hopper_infeed.setSmartCurrentLimit(30);
 
         CPM.setSmartCurrentLimit(40);
+
+        left1.setSmartCurrentLimit(70);
+        left2.setSmartCurrentLimit(70);
+        right1.setSmartCurrentLimit(70);
+        right2.setSmartCurrentLimit(70);
+
+        climberLeft.setSmartCurrentLimit(70);
+        climberRight.setSmartCurrentLimit(70);
 
         CPM.burnFlash();
         intake.burnFlash();
         intake2.burnFlash();
         climberLeft.burnFlash();
         climberRight.burnFlash();
+        miniShooter.burnFlash();
+        hopper.burnFlash();
+        hopper_infeed.burnFlash();
         left1.burnFlash();
         left2.burnFlash();
         right1.burnFlash();

@@ -43,7 +43,7 @@ public class ColorThing {
   private int r_itr = 10; 
   private int rotations = 8;
   private String current_color;
-  private boolean is_spinning;
+  public boolean is_spinning;
 
   public ColorThing(Robot robot) {
     m_colorMatcher.addColorMatch(kBlueTarget);
@@ -125,7 +125,7 @@ public class ColorThing {
       is_spinning = true;
     }
     
-    if(/*is_spinning*/reset){
+    if(is_spinning) {
        robot.motor.CPM.set(0.3);
      } else {
       robot.motor.CPM.set(0);
