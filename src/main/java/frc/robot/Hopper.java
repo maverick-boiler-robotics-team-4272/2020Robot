@@ -48,8 +48,6 @@ public class Hopper {
     double shooter_feeder_wheel = -0.4;
 
 
-    boolean intakeSwitch = true;// is this used?
-
     //true = error code runs, false = error code not run
     public boolean needCorrections = false;
 
