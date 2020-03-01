@@ -65,6 +65,10 @@ public class Hopper {
         hopper = robot.motor.hopper;
         shooter_infeed = robot.motor.miniShooter;
     }
+
+    public void reset(){
+        //things to do once
+    }
     
 
     //the loop method that makes sure teleop is less cluttered

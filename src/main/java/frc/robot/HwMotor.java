@@ -144,6 +144,7 @@ public class HwMotor {
         rightPID.setI(drivekI);
         rightPID.setD(drivekD);
         rightPID.setFF(drivekF);
+        
         leftPID.setOutputRange(-1, 1);
         leftPID.setP(drivekP);
         leftPID.setI(drivekI);
@@ -192,137 +193,6 @@ public class HwMotor {
         left2.burnFlash();
         right1.burnFlash();
         right2.burnFlash();
-
-
-        table.addEntryListener("shooter_kP", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double newKP = value.getDouble();
-                shooter1.config_kP(0, newKP, 30);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("shooter_kF", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double newKF = value.getDouble();
-                shooter1.config_kF(0, newKF, 30);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("shooter_kI", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double newKI = value.getDouble();
-                shooter1.config_kP(0, newKI, 30);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("shooter_kD", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double newKD = value.getDouble();
-                shooter1.config_kP(0, newKD, 30);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("intake_kP", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double intakeNewKP = value.getDouble();
-                intakePID.setP(intakeNewKP);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("intake_kF", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double intakeNewKF = value.getDouble();
-                intakePID.setFF(intakeNewKF);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("intake_kI", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double intakeNewKI = value.getDouble();
-                intakePID.setI(intakeNewKI);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("intake_kD", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double intakeNewKD = value.getDouble();
-                intakePID.setD(intakeNewKD);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("drivekP", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double driveNewKP = value.getDouble();
-                rightPID.setP(driveNewKP);
-                leftPID.setP(driveNewKP);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("drivekI", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double driveNewKI = value.getDouble();
-                rightPID.setI(driveNewKI);
-                leftPID.setI(driveNewKI);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("drivekD", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double driveNewKD = value.getDouble();
-                rightPID.setD(driveNewKD);
-                leftPID.setD(driveNewKD);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("drivekF", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double driveNewKF = value.getDouble();
-                rightPID.setFF(driveNewKF);
-                leftPID.setFF(driveNewKF);
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-
-        table.addEntryListener("targetVeloc", new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                double TargetVeloc = value.getDouble();
-                robot.teleop.rpm = TargetVeloc;
-            }
-            
-        }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-    }
-
-    public void logNetworkTables(){
-        robot.tables.intakeVel.setNumber(intakeEncoder.getVelocity());
-        robot.tables.intakeTemp.setNumber(intake.getMotorTemperature());
-        robot.tables.rightDriveVel.setNumber(rightEncoder.getVelocity());
-        robot.tables.rightDriveOutput.setNumber(right1.getAppliedOutput());
-        robot.tables.leftDriveVel.setNumber(leftEncoder.getVelocity());
-        robot.tables.leftDriveOutput.setNumber(left1.getAppliedOutput());
     }
 
     public void setLeftVelocity(double rpmSetpoint, double feedforward){

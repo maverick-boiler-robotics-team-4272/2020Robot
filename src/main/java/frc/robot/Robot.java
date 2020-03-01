@@ -30,6 +30,7 @@ public class Robot extends TimedRobot {
   public Hopper hopper;
   public NewAuto auto;
   public NetworkTables tables;
+  public AllBot allbot;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -47,7 +48,8 @@ public class Robot extends TimedRobot {
     intake = new Intake(this);
     color = new ColorThing(this);
     hopper = new Hopper(this);
-    tables = net NetworkTables(this);
+    tables = new NetworkTables(this);
+    allbot = new AllBot(this);
   }
 
   /**

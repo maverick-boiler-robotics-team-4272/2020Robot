@@ -10,6 +10,14 @@ public class Climber{
         this.robot = robot;
     }
 
+    public void loop(){
+        //loopy type things
+    }
+
+    public void reset(){
+        //things to do once
+    }
+
     //disables solenoid
     public void off(){
         robot.pneumatics.climberSolenoid.set(kOff);

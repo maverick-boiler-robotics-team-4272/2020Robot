@@ -16,6 +16,7 @@ public class HwPneumatics {
     public DoubleSolenoid intakeSolenoid = new DoubleSolenoid(2, 5);
     public DoubleSolenoid CPMSolenoid = new DoubleSolenoid(3, 4);
     public Solenoid extra = new Solenoid(0);
+
     public HwPneumatics(){
         c.setClosedLoopControl(true);
         climberSolenoid.set(DoubleSolenoid.Value.kForward);
@@ -23,6 +24,7 @@ public class HwPneumatics {
         CPMSolenoid.set(DoubleSolenoid.Value.kForward);
         extra.set(false);
     }
+    
     public void compressor(){
         if(c.getClosedLoopControl()){
             c.setClosedLoopControl(false);

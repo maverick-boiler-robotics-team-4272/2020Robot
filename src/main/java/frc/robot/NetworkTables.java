@@ -168,4 +168,21 @@ public class NetworkTables{
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
     }
+
+    public void logNetworkTables(){
+        robot.tables.intakeVel.setNumber(intakeEncoder.getVelocity());
+        robot.tables.intakeTemp.setNumber(intake.getMotorTemperature());
+        robot.tables.rightDriveVel.setNumber(rightEncoder.getVelocity());
+        robot.tables.rightDriveOutput.setNumber(right1.getAppliedOutput());
+        robot.tables.leftDriveVel.setNumber(leftEncoder.getVelocity());
+        robot.tables.leftDriveOutput.setNumber(left1.getAppliedOutput());
+    }
+
+    public void loop(){
+        logNetworkTables();
+    }
+
+    public void reset(){
+        //things to do once
+    }
 }

@@ -20,6 +20,14 @@ public class Shooter {
         this.robot = robot;
     }
 
+    public void loop(){
+        //loopy type things
+    }
+
+    public void reset(){
+        //things to do once
+    }
+
     public void setShooterRPM(double rpm){
         robot.motor.shooter1.set(ControlMode.Velocity, rpm / SENSOR_TO_RPM);
         robot.tables.shooterVelSetPoint.setNumber(rpm);

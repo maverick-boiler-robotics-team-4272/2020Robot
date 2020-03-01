@@ -64,6 +64,14 @@ public class ColorThing {
     is_spinning = false;
   }
 
+  public void loop(){
+        //loopy type things
+    }
+
+    public void reset(){
+        //things to do once
+    }
+
   public void colorRotation(boolean reset) {
     //gets the current RGB value fo the color sensor
     Color detectedColor = m_colorSensor.getColor();

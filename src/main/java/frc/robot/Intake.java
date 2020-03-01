@@ -13,6 +13,14 @@ public class Intake{
         this.robot = robot;
     }
 
+    public void loop(){
+        //loopy type things
+    }
+
+    public void reset(){
+        //things to do once
+    }
+
     // turns off the motors for the intake
     public void off(){
         robot.pneumatics.intakeSolenoid.set(kOff);

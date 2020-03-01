@@ -33,6 +33,15 @@ public class Camera {
         robot.tables.limelightLed.setNumber(numero);
         
     }
+
+    public void loop(){
+        //loopy type things
+    }
+
+    public void reset(){
+        //things to do once
+    }
+
     public void updateLimelightTracking(){
         final double STEER_K = 0.005; // max speed the robot should turn
         final double DRIVE_K = -0.26; // the feed foreward for the robot drive
