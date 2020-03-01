@@ -99,11 +99,11 @@ public class Hopper {
 
     public void update_tables(){//updates the network tables for the ball placements
         robot.hopper.readSensorValues(); // update sensor values
-        robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);//first ball (closest to intake)
-        robot.motor.ball2.setBoolean(robot.hopper.prev_intake_to_hopper_sensor);//second ball (second closest to intake)
-        robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_a);//third ball (third closest to intake)
-        robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_b);//fourth ball (fourth closest to intake)
-        robot.motor.ball5.setBoolean(robot.hopper.hopper_ball_c);//shooter ball (the one right below the shooter fly wheel)
+        robot.tables.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);//first ball (closest to intake)
+        robot.tables.ball2.setBoolean(robot.hopper.prev_intake_to_hopper_sensor);//second ball (second closest to intake)
+        robot.tables.ball3.setBoolean(robot.hopper.hopper_ball_a);//third ball (third closest to intake)
+        robot.tables.ball4.setBoolean(robot.hopper.hopper_ball_b);//fourth ball (fourth closest to intake)
+        robot.tables.ball5.setBoolean(robot.hopper.hopper_ball_c);//shooter ball (the one right below the shooter fly wheel)
     }
 
     //the below functions are to make sure loop does not break and so teleop can call it

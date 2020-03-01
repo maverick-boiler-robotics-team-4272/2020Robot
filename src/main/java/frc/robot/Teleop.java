@@ -124,15 +124,6 @@ public class Teleop {
             robot.intake.off();
         }
 
-        // if(robot.jstick.xbox.getStartButton()){
-        //     robot.motor.intake.set(0.4);
-        //     robot.motor.hopper_infeed.set(0.4);
-        //     robot.motor.hopper.set(0.4);
-        // }else if(robot.jstick.xbox.getStartButtonReleased()){
-        //     robot.motor.intake.set(0);
-        //     robot.motor.hopper_infeed.set(0);
-        //     robot.motor.hopper.set(0);
-        // }
 
         if(robot.jstick.xbox.getStartButton()) {
             robot.pneumatics.compressor();
@@ -180,14 +171,8 @@ public class Teleop {
             robot.motor.climberLeft.set(0);
         }
 
-        robot.hopper.readArduino(); // update sensor values
         robot.hopper.loop(rpm);
         robot.shooter.sendNumbers();
-        robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);
-        robot.motor.ball2.setBoolean(robot.hopper.hopper_ball_a);
-        robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_b);
-        robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_c);
-        robot.motor.ball5.detBoolean(robot.hopper.shooter_ball);
     }
 
     public void drive(double leftPower, double rightPower) {
