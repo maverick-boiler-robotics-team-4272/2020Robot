@@ -98,7 +98,7 @@ public class Hopper {
     }
 
     public void update_tables(){//updates the network tables for the ball placements
-        robot.hopper.readArduino(); // update sensor values
+        robot.hopper.readSensorValues(); // update sensor values
         robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);//first ball (closest to intake)
         robot.motor.ball2.setBoolean(robot.hopper.prev_intake_to_hopper_sensor);//second ball (second closest to intake)
         robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_a);//third ball (third closest to intake)
@@ -173,102 +173,39 @@ public class Hopper {
                             hopper.set(belt_speed);//move balls in hopper one spot
                         }
                     } else {//is a ball in spot c (5 balls in hopper)
-                        shooter_infeed.set(0);
-                        hopper_infeed.set(0);
-                        hopper.set(0);
+                        shooter_infeed.set(0);//move nothing
+                        hopper_infeed.set(0);//move nothing
+                        hopper.set(0);//move nothing
                     }
-                } else {
-                    if (hopper_ball_a || hopper_ball_b || hopper_ball_c) {
-                        shooter_infeed.set(0);
-                        hopper_infeed.set(belt_speed);
-                        hopper.set(0);
-                        // intake_control.on();
-                    } else {
-                        shooter_infeed.set(0);
-                        hopper_infeed.set(belt_speed);
-                        hopper.set(belt_speed);
-                        // intake_control.on();
+                } else {//if there is not a ball in the first set of belts
+                    if (hopper_ball_a || hopper_ball_b || hopper_ball_c) {//tests for any balls in the main hopper section
+                        shooter_infeed.set(0);//dont moveball that is just befor shooter fly wheel
+                        hopper_infeed.set(belt_speed);//move the first set of belts
+                        hopper.set(0);//but not the main hopper
+                    } else {//no balls in main hopper area
+                        shooter_infeed.set(0);//dont moveball that is just befor shooter fly wheel
+                        hopper_infeed.set(belt_speed);//move first set of belts
+                        hopper.set(belt_speed);//and main hopper belts
                     }
                 }
             }
-        } else {
+        } else {//shooting balls
+            //test if the velocity is within tolerances
             if (robot.motor.shooter1.getSelectedSensorVelocity() >= lowerDifference && robot.motor.shooter1.getSelectedSensorVelocity() <= upperDifference){
+                // if it is than move all the belts and shooter infeed wheel
                 shooter_infeed.set(-1);
                 hopper_infeed.set(-0.2);
                 hopper.set(-0.2);
-            } else {
+            } else {// if the shooter is not up to speed, then do not move anything
                 shooter_infeed.set(0);
                 hopper_infeed.set(0);
                 hopper.set(0);
             }
-        }/*} else {
-            retract();
-        }*/
+        }
     }
 
-    public void retract(){
-        hopper_infeed.set(-1 * belt_speed);
-        hopper.set(-1 * belt_speed);
-    }
 
-    public void readArduino() {
-        // byte[] buffer = new byte[MAX_BYTES];
-        // byte[] data = new byte[1];
-        // data[0] = (byte)lightState;
-        // Wire.read(4, MAX_BYTES, buffer);
-        // String out = new String(buffer);
-        // int pt = out.indexOf((char)255);
-        // String num = new String(out.substring(0, pt < 0 ? 0 : pt));
-        // System.out.println("received: " + num);
-        // int intOut = Integer.parseInt(num);
-        // // for(var i = 0; i < 7; i++){
-        // // if(intOut % 1 == 1){
-        // // hopper_ball_a = true;
-        // // }
-        // // else if(intOut % 2 == 0){
-        // // hopper_ball_b = true;
-        // // }
-        // // }
-        // if(intOut % 2 == 1){
-        // intake_sensor = true;
-        // } else {
-        // intake_sensor = false;
-        // }
-        // intOut = intOut/2;
-        // if(intOut % 2 == 1){
-        // intake_to_hopper_sensor = true;
-        // } else {
-        // intake_to_hopper_sensor= false;
-        // }
-        // intOut = intOut/2;
-        // if(intOut % 2 == 1){
-        // hopper_ball_a = true;
-        // } else {
-        // hopper_ball_a = false;
-        // }
-        // intOut = intOut/2;
-        // if(intOut % 2 == 1){
-        // hopper_ball_b = true;
-        // } else {
-        // hopper_ball_b = false;
-        // }
-        // intOut = intOut/2;
-        // if(intOut % 2 == 1){
-        // hopper_ball_c = true;
-        // } else {
-        // hopper_ball_c = false;
-        // }
-        // intOut = intOut/2;
-        // if(intOut % 2 == 1){
-        // shooter_ball = true;
-        // } else {
-        // shooter_ball = false;
-        // }
-        // if(intake_sense.get()){
-        // intake_sensor = true;
-        // } else {
-        // intake_sensor = false;
-        // }
+    public void readSensorValues() {//reads value from line break sensors, and puts the result in variables
         if (!intake_to_hopper_sense.get()) {
             intake_to_hopper_sensor = true;
         } else {
@@ -296,14 +233,14 @@ public class Hopper {
         }
     }
 
-    private void disable() {
+    private void disable() {//do nothing
         hopper.set(0);
         hopper_infeed.set(0);
         shooter_infeed.set(0);
         // intake_control.off();
     }
 
-    private void errorCorrection(){
+    private void errorCorrection(){//error code (not sure what it does)
         if(needCorrections){
             if(!shooter_ball){
                 if(!hopper_ball_c){
@@ -325,7 +262,7 @@ public class Hopper {
                 }
             }else if(!hopper_ball_a || !hopper_ball_b || !hopper_ball_c){
                 if(!prev_intake_to_hopper_sensor){
-                    robot.motor.hopper_infeed.set(-0.2);
+                    robot.motor.hopper_infeed.set(-0.2);//why move it forewards?
                 }else{
                     robot.motor.hopper_infeed.set(0);
                 }
