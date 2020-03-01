@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Compressor;
 
 public class HwPneumatics {
-    public Compressor c = new Compressor(0);
+    public Compressor c = new Compressor(0);//needs this so we can actually use pneumatics
 
     public boolean enabled = c.enabled();
     public boolean pressureSwitch = c.getPressureSwitchValue();

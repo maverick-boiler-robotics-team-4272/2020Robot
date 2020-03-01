@@ -27,12 +27,12 @@ public class ColorThing {
 
 
   //declares our network table entries for simplicity
-  NetworkTableEntry colorSensor = robot.motor.colorSensor;
-  NetworkTableEntry rawColorSensor_r = robot.motor.rawColorSensor_r;
-  NetworkTableEntry rawColorSensor_g = robot.motor.rawColorSensor_g;
-  NetworkTableEntry rawColorSensor_b = robot.motor.rawColorSensor_b;
-  NetworkTableEntry proximit = robot.motor.proximit;
-  NetworkTableEntry go_stop = robot.motor.go_stop;
+  NetworkTableEntry colorSensor = robot.tables.colorSensor;
+  NetworkTableEntry rawColorSensor_r = robot.tables.rawColorSensor_r;
+  NetworkTableEntry rawColorSensor_g = robot.tables.rawColorSensor_g;
+  NetworkTableEntry rawColorSensor_b = robot.tables.rawColorSensor_b;
+  NetworkTableEntry proximit = robot.tables.proximit;
+  NetworkTableEntry go_stop = robot.tables.go_stop;
 
   //how many times the color has been hit on the wheel
   private int y_itr = 10;

@@ -22,8 +22,7 @@ public class Shooter {
 
     public void setShooterRPM(double rpm){
         robot.motor.shooter1.set(ControlMode.Velocity, rpm / SENSOR_TO_RPM);
-        // motor.shooter1.set(ControlMode.PercentOutput, -0.2);
-        robot.motor.shooterVelSetPoint.setNumber(rpm);
+        robot.tables.shooterVelSetPoint.setNumber(rpm);
     }
 
     //Temporary hopper code??
@@ -37,9 +36,8 @@ public class Shooter {
     }
 
     public void sendNumbers(){
-        robot.motor.shooterVel.setNumber(SENSOR_TO_RPM * robot.motor.shooter1.getSelectedSensorVelocity());
-        // System.out.println("motor power: " + motor.shooter1.getMotorOutputPercent());
-        robot.motor.shooterOutput.setNumber(robot.motor.shooter1.getMotorOutputPercent());
+        robot.tables.shooterVel.setNumber(SENSOR_TO_RPM * robot.motor.shooter1.getSelectedSensorVelocity());
+        robot.tables.shooterOutput.setNumber(robot.motor.shooter1.getMotorOutputPercent());
     }
 
     public void shooterDisable(){

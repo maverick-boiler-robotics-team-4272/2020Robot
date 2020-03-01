@@ -64,29 +64,6 @@ public class HwMotor {
 
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table = inst.getTable("datatable");
-    private NetworkTableEntry pre_kP = table.getEntry("shooter_kP");
-    private NetworkTableEntry pre_kF = table.getEntry("shooter_kF");
-    private NetworkTableEntry pre_kI = table.getEntry("shooter_kI");
-    private NetworkTableEntry pre_kD = table.getEntry("shooter_kD");
-    private NetworkTableEntry intake_pre_kP = table.getEntry("intake_kP");
-    private NetworkTableEntry intake_pre_kF = table.getEntry("intake_kF");
-    private NetworkTableEntry intake_pre_kI = table.getEntry("intake_kI");
-    private NetworkTableEntry intake_pre_kD = table.getEntry("intake_kD");
-    public NetworkTableEntry shooterVel = table.getEntry("ShooterVelocity");
-    public NetworkTableEntry intakeVel = table.getEntry("IntakeVelocity");
-    public NetworkTableEntry intakeTemp = table.getEntry("IntakeTemp");
-    public NetworkTableEntry shooterOutput = table.getEntry("ShooterOutput");
-    public NetworkTableEntry shooterVelSetPoint = table.getEntry("ShooterVelocitySetPoint");
-    private NetworkTableEntry drivePrekP = table.getEntry("drivekP");
-    private NetworkTableEntry drivePrekI = table.getEntry("drivekI");
-    private NetworkTableEntry drivePrekD = table.getEntry("drivekD");
-    private NetworkTableEntry drivePrekF = table.getEntry("drivekF");
-    public NetworkTableEntry rightDriveVel = table.getEntry("rightDriveVelocity");
-    public NetworkTableEntry rightDriveOutput = table.getEntry("rightDriveOutput");
-    public NetworkTableEntry rightDriveVelSetpoint = table.getEntry("rightSetpointReadout");
-    public NetworkTableEntry leftDriveVel = table.getEntry("leftDriveVelocity");
-    public NetworkTableEntry leftDriveOutput = table.getEntry("leftDriveOutput");
-    public NetworkTableEntry leftDriveVelSetpoint = table.getEntry("leftSetpointReadout");
     public NetworkTableEntry ball1 = table.getEntry("BallAStatus");
     public NetworkTableEntry ball2 = table.getEntry("BallBStatus");
     public NetworkTableEntry ball3 = table.getEntry("BallCStatus");
@@ -133,10 +110,10 @@ public class HwMotor {
         // shooter2.configVoltageCompSaturation(12);
         shooter1.enableVoltageCompensation(true);
         
-        pre_kP.setDouble(0.15);
-        pre_kI.setDouble(0.005);
-        pre_kD.setDouble(0.0114);
-        pre_kF.setDouble(0.0101);
+        robot.tables.pre_kP.setDouble(0.15);
+        robot.tables.pre_kI.setDouble(0.005);
+        robot.tables.pre_kD.setDouble(0.0114);
+        robot.tables.pre_kF.setDouble(0.0101);
 
         
         intakePID = intake.getPIDController();
@@ -148,10 +125,10 @@ public class HwMotor {
         intakePID.setFF(intake_kF);
         // intake2.follow(intake, true);
 
-        intake_pre_kP.setDouble(0);
-        intake_pre_kF.setDouble(0.000093);
-        intake_pre_kI.setDouble(0);
-        intake_pre_kD.setDouble(0);
+        robot.tables.intake_pre_kP.setDouble(0);
+        robot.tables.intake_pre_kF.setDouble(0.000093);
+        robot.tables.intake_pre_kI.setDouble(0);
+        robot.tables.intake_pre_kD.setDouble(0);
 
         left2.follow(left1);
         right2.follow(right1);
@@ -173,10 +150,10 @@ public class HwMotor {
         leftPID.setD(drivekD);
         leftPID.setFF(drivekF);
 
-        drivePrekP.setDouble(0);
-        drivePrekF.setDouble(0.0);
-        drivePrekI.setDouble(0);
-        drivePrekD.setDouble(0);
+        robot.tables.drivePrekP.setDouble(0);
+        robot.tables.drivePrekF.setDouble(0.0);
+        robot.tables.drivePrekI.setDouble(0);
+        robot.tables.drivePrekD.setDouble(0);
 
         // climberLeft.follow(climberRight);
         //climberLeft.follow(null);
@@ -334,31 +311,28 @@ public class HwMotor {
             public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
                 double TargetVeloc = value.getDouble();
                 robot.teleop.rpm = TargetVeloc;
-                System.out.println("new target velocity: " + TargetVeloc);
             }
             
         }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
     }
 
     public void logNetworkTables(){
-        intakeVel.setNumber(intakeEncoder.getVelocity());
-        intakeTemp.setNumber(intake.getMotorTemperature());
-        rightDriveVel.setNumber(rightEncoder.getVelocity());
-        rightDriveOutput.setNumber(right1.getAppliedOutput());
-        leftDriveVel.setNumber(leftEncoder.getVelocity());
-        leftDriveOutput.setNumber(left1.getAppliedOutput());
+        robot.tables.intakeVel.setNumber(intakeEncoder.getVelocity());
+        robot.tables.intakeTemp.setNumber(intake.getMotorTemperature());
+        robot.tables.rightDriveVel.setNumber(rightEncoder.getVelocity());
+        robot.tables.rightDriveOutput.setNumber(right1.getAppliedOutput());
+        robot.tables.leftDriveVel.setNumber(leftEncoder.getVelocity());
+        robot.tables.leftDriveOutput.setNumber(left1.getAppliedOutput());
     }
 
     public void setLeftVelocity(double rpmSetpoint, double feedforward){
         leftPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
-        leftDriveVelSetpoint.setNumber(rpmSetpoint);
-        System.out.println("left speed: " + rpmSetpoint + "\n left FF: " + feedforward);
+        robot.tables.leftDriveVelSetpoint.setNumber(rpmSetpoint);
     }
 
     public void setRightVelocity(double rpmSetpoint, double feedforward){
         rightPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
-        rightDriveVelSetpoint.setNumber(rpmSetpoint);
-        System.out.println("right speed: " + rpmSetpoint + "\n right FF: " + feedforward);
+        robot.tables.rightDriveVelSetpoint.setNumber(rpmSetpoint);
     }
 
     public void climberExtend(double power){

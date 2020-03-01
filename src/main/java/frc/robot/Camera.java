@@ -30,7 +30,7 @@ public class Camera {
             numero = 1;
         }
         //publish led status to limelight network table
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(numero);
+        robot.tables.limelightLed.setNumber(numero);
         
     }
     public void updateLimelightTracking(){
@@ -43,13 +43,13 @@ public class Camera {
         //getting current network table entries
 
         //found target (1 for found, 0 for not found)
-        double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+        double tv = robot.tables.limelightValidTarget.getDouble(0);
 
         //x degrees from center of found target
-        double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+        double tx = robot.tables.limelightXDegrees.getDouble(0);
 
         //y degrees from center of found target
-        double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+        double ty = robot.tables.limelightYDegrees.getDouble(0);
         //end network table section
 
 
@@ -66,8 +66,5 @@ public class Camera {
 
         double steer_cmd = tx * STEER_K; //how fast it should steer
         m_LimelightSteerCommand = steer_cmd; // puts the above into an other more different variable
-
-
-   
     }
 }
