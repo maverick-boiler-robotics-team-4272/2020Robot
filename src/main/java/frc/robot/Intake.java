@@ -6,43 +6,55 @@ import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class Intake{
-    Robot robot;//makes sure that it can access the rest of the robot
+	Robot robot;//makes sure that it can access the rest of the robot
 
-    //instanciates the class
-    public Intake(Robot robot){
-        this.robot = robot;
-    }
+	private boolean extended = false;
 
-    public void loop(){
-        //loopy type things
-    }
+	//instanciates the class
+	public Intake(Robot robot){
+		this.robot = robot;
+	}
 
-    public void reset(){
-        //things to do once
-    }
+	public void loop(){
+		//loopy type things
+	}
 
-    // turns off the motors for the intake
-    public void off(){
-        robot.pneumatics.intakeSolenoid.set(kOff);
-        robot.motor.intake.set(0);
-        robot.motor.intake2.set(0);
-    }
+	public void reset(){
+		//things to do once
+	}
 
-    // extends the pneumatic for the intake
-    public void out(){
-        robot.pneumatics.intakeSolenoid.set(kReverse);
-    }
+	public void toggle(){
+		if(extended){
+			in();
+			extended = false;
+		} else {
+			out();
+			extended = true;
+		}
+	}
 
-    // retracts the pneumatic for the intake
-    public void in(){
-        robot.pneumatics.intakeSolenoid.set(kForward);
-        robot.motor.intake.set(0);
-        robot.motor.intake2.set(0);
-    }
+	// turns off the motors for the intake
+	public void off(){
+		robot.pneumatics.intakeSolenoid.set(kOff);
+		robot.motor.intake.set(0);
+		robot.motor.intake2.set(0);
+	}
 
-    // turns on the motors for the intake
-    public void on(double speed){
-        robot.motor.intake.set(speed);
-        robot.motor.intake2.set(-speed);
-    }
+	// extends the pneumatic for the intake
+	public void out(){
+		robot.pneumatics.intakeSolenoid.set(kReverse);
+	}
+
+	// retracts the pneumatic for the intake
+	public void in(){
+		robot.pneumatics.intakeSolenoid.set(kForward);
+		robot.motor.intake.set(0);
+		robot.motor.intake2.set(0);
+	}
+
+	// turns on the motors for the intake
+	public void on(double speed){
+		robot.motor.intake.set(speed);
+		robot.motor.intake2.set(-speed);
+	}
 }

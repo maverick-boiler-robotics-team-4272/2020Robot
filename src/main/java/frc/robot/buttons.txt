@@ -9,33 +9,33 @@ drive sticks:
   
 
 xbox controller:
-    left side:
-    
-        joystick up = increase target rpm for shooter wheel
-        joystick down  = decrease target rpm for shooter wheel
+	left side:
+	
+		joystick up = increase target rpm for shooter wheel
+		joystick down  = decrease target rpm for shooter wheel
 
-        back button = disable shooter wheel
-        start button = start shooter wheel
+		back button = disable shooter wheel
+		start button = start shooter wheel
   
-        left bumper = toggle led on or off
+		left bumper = toggle led on or off
 
-        left trigger = intake stuff
-        
+		left trigger = intake stuff
+		
 
-    right side:
-    
-        y button = climber pneumatics
+	right side:
+	
+		y button = climber pneumatics
 
-        a button = start rotation for stage two on color wheel
+		a button = start rotation for stage two on color wheel
 
-        right bumper = toggle limelight pipeline
+		right bumper = toggle limelight pipeline
 
-        x button pressed does intake/hopper cool stuff
+		x button pressed does intake/hopper cool stuff
 
-        right trigger with other buttons:
-            a pressed
-            x pressed = color position
-            b pressed CPM pneumatics
-            y pressed Climber pneumatics
-           
+		right trigger with other buttons:
+			a pressed
+			x pressed = color position
+			b pressed CPM pneumatics
+			y pressed Climber pneumatics
+		   
 just testing #2 :)

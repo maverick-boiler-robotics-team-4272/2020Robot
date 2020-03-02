@@ -1,10 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -13,43 +6,50 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
  * Add your docs here.
  */
 public class Shooter {
-    Robot robot;
-    public static final double SENSOR_TO_RPM = 0.07325;
+	Robot robot;
+	public static final double SENSOR_TO_RPM = 0.07325;
 
-    public Shooter(Robot robot) {
-        this.robot = robot;
-    }
+	private double rpm = robot.teleop.rpm;
 
-    public void loop(){
-        //loopy type things
-    }
+	private boolean is_shooting = false;
 
-    public void reset(){
-        //things to do once
-    }
+	public Shooter(Robot robot) {
+		this.robot = robot;
+	}
 
-    public void setShooterRPM(double rpm){
-        robot.motor.shooter1.set(ControlMode.Velocity, rpm / SENSOR_TO_RPM);
-        robot.tables.shooterVelSetPoint.setNumber(rpm);
-    }
+	public void loop(){
+		sendNumbers();
+		if(is_shooting){
+			setShooterRPM();
+		} else {
+			shooterDisable();
+		}
+	}
 
-    //Temporary hopper code??
-    public void sendTheHopper(double speed){
-        robot.motor.hopper.set(-speed);
-        robot.motor.hopper_infeed.set(-speed);
-    }
+	public void reset(){
+		//things to do once
+	}
 
-    public void miniShootBOI(double speed){
-        robot.motor.miniShooter.set(-speed);
-    }
+	public void startShooter(){
+		is_shooting = true;
+	}
 
-    public void sendNumbers(){
-        robot.tables.shooterVel.setNumber(SENSOR_TO_RPM * robot.motor.shooter1.getSelectedSensorVelocity());
-        robot.tables.shooterOutput.setNumber(robot.motor.shooter1.getMotorOutputPercent());
-    }
+	public void stopShooter(){
+		is_shooting = false;
+	}
 
-    public void shooterDisable(){
-        robot.motor.shooter1.set(ControlMode.PercentOutput, 0);
-    }
+	private void setShooterRPM(){
+		robot.motor.shooter1.set(ControlMode.Velocity, rpm / SENSOR_TO_RPM);
+		robot.tables.shooterVelSetPoint.setNumber(rpm);
+	}
+
+	private void sendNumbers(){
+		robot.tables.shooterVel.setNumber(SENSOR_TO_RPM * robot.motor.shooter1.getSelectedSensorVelocity());
+		robot.tables.shooterOutput.setNumber(robot.motor.shooter1.getMotorOutputPercent());
+	}
+
+	private void shooterDisable(){
+		robot.motor.shooter1.set(ControlMode.PercentOutput, 0);
+	}
 
 }
