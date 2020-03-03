@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 		auto = new NewAuto(this);
 		motor = new HwMotor(this);
 		jstick = new HwJoystick();
-		camera = new Camera();
+		camera = new Camera(this);
 		shooter = new Shooter(this);
 		pneumatics = new HwPneumatics();
 		climber = new Climber(this);
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotPeriodic() {
-		motor.logNetworkTables();
+		tables.logNetworkTables();
 		hopper.update_tables();
 	}
 

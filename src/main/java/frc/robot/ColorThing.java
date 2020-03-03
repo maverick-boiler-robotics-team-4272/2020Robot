@@ -127,6 +127,10 @@ public class ColorThing {
      }
   }
 
+  public void loop() {}
+
+  public void reset() {}
+
 	public void colorSelection(String color /*recieved color from FMS*/) {//stage 3 of the match for color selection from FMS
 
 		//gets color

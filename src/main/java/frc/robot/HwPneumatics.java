@@ -36,8 +36,8 @@ public class HwPneumatics {
 	
 
 	boolean CPMUp = false;
-	public void CPMPneumatics(boolean up){
-		if(up){
+	public void CPMPneumatics(boolean toggle){
+		if(toggle){
 			if(CPMUp){
 				CPMSolenoid.set(DoubleSolenoid.Value.kReverse);
 				CPMUp = false;

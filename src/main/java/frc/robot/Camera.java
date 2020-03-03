@@ -5,15 +5,19 @@ import edu.wpi.first.networktables.*;
  * Add your docs here.
  */
 public class Camera {
+	Robot robot;
 
 	//variables for limelight aiming
 	public boolean m_LimelightHasValidTarget = false;
 	public double m_LimelightDriveCommand = 0.0;// never move forewards or backwards
 	public double m_LimelightSteerCommand = 0.0;
 
-	private boolean is_aligning = false;
+	public boolean is_aligning = false;
 	private boolean is_driver_vision = true;
 
+	public Camera(Robot robot) {
+		this.robot = robot;
+	}
 
 	public void changingLed(boolean on){
 		//defalt setting for limelight network table led activation 1 being off and 3 being on
@@ -33,14 +37,14 @@ public class Camera {
 	public void loop(){
 		if(is_aligning){
 			updateLimelightTracking();
-			leftSpeed = m_LimelightDriveCommand - m_LimelightSteerCommand;
-			rightSpeed = m_LimelightDriveCommand + m_LimelightSteerCommand;
+			double leftSpeed = m_LimelightDriveCommand - m_LimelightSteerCommand;
+			double rightSpeed = m_LimelightDriveCommand + m_LimelightSteerCommand;
 			changingLed(true);
-			robot.teleop.drive(leftSpeed, rightSpeed);
+			// robot.teleop.drive(leftSpeed, rightSpeed);
 		} else if(is_driver_vision) {
 			changingLed(false);
 		} else {
-			system.out.println("you screwed up the robot");
+			System.out.println("you screwed up the robot");
 		}
 	}
 

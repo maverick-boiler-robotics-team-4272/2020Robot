@@ -56,7 +56,7 @@ public class Hopper {
     }
     
 
-    public void loop(double rpm) {
+    public void loop() {
         if(is_shooting){
             movement(true, false);
         } else if(is_intaking){
@@ -70,13 +70,15 @@ public class Hopper {
         } else {
             disable();
         }
-        this.rpm = rpm;
+        this.rpm = robot.teleop.rpm;
         if(!is_shooting || !is_intaking){
             if(Timer.getFPGATimestamp() - current_intake_time >= 1){
                 stop_hopper();
             }
         }
     }
+
+    public void reset() {}
 
     public void update_tables(){
         robot.hopper.readArduino(); // update sensor values

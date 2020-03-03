@@ -66,7 +66,13 @@ public class Teleop {
 		}else{
 			rightSpeed *= -1 * rightSpeed;
 		}
-		
+        
+        // robot.camera.loop();
+        if(robot.camera.is_aligning) {
+            leftSpeed = robot.camera.m_LimelightDriveCommand - robot.camera.m_LimelightSteerCommand;
+			rightSpeed = robot.camera.m_LimelightDriveCommand + robot.camera.m_LimelightSteerCommand;
+        }
+
 		drive(leftSpeed, rightSpeed);
 		
 		if (robot.jstick.leftJoystick.getTrigger()) {
@@ -115,7 +121,7 @@ public class Teleop {
 				robot.intake.toggle();
 			}
 			if (robot.jstick.xbox.getBButtonPressed()) {
-				robot.color.toggle();
+				robot.pneumatics.CPMPneumatics(true);
 			} else if (robot.jstick.xbox.getYButtonPressed()) {
 				robot.climber.toggle();
 			} else if (robot.jstick.xbox.getXButton()) {
@@ -136,7 +142,7 @@ public class Teleop {
 			robot.motor.climberLeft.set(0);
 		}
 
-		robot.hopper.loop(rpm);
+		// robot.hopper.loop(rpm);
 	}
 
 	public void drive(double leftPower, double rightPower) {
