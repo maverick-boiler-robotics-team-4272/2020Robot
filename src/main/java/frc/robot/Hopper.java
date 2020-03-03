@@ -72,10 +72,12 @@ public class Hopper {
             disable();
         }
         this.rpm = rpm;
-        if(!is_shooting || !is_intaking){
-            if(Timer.getFPGATimestamp() - current_intake_time >= 1){
-                stop_hopper();
-            }
+        if(!is_shooting){
+            // if(Timer.getFPGATimestamp() - current_intake_time >= 1){
+            stop_hopper();
+            // }
+        }else if(!is_intaking){
+            stop_hopper();
         }
     }
 

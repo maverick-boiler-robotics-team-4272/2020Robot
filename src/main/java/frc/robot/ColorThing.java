@@ -127,9 +127,12 @@ public class ColorThing {
     
     if(is_spinning) {
        robot.motor.CPM.set(0.3);
+       System.out.println("CPM Encoder counts: " + robot.motor.CPM.getEncoder().getPosition());
      } else {
       robot.motor.CPM.set(0);
      }
+     //Starting encoder counts : 1562.692
+     //Ending encoder counts : 1750.139
   }
 
   public void colorSelection(String color) {
