@@ -1,7 +1,11 @@
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -15,7 +19,9 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 
 /**
@@ -24,13 +30,12 @@ import edu.wpi.first.wpilibj.util.Units;
 public class NewAuto {
 	Robot robot;
 	RamseteController ramsete = new RamseteController();
-	DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(62.40537218874971 / 100);
-	DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 10);
+	DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(-Units.inchesToMeters(25.5));
 	public DifferentialDriveOdometry driveOdometry;
-	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(10), Units.feetToMeters(3));
+	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(5), Units.feetToMeters(3));
 	public double autoStartTime;
 	public Trajectory trajectory;
-	double RPM_TO_MPS = (9/84) * Units.inchesToMeters(6) * Math.PI;
+	double RPM_TO_MPS = (9.0/84.0) * Units.inchesToMeters(6) * Math.PI;
 	DifferentialDriveWheelSpeeds prevSpeeds = new DifferentialDriveWheelSpeeds(0, 0);
 	double prevTime = 0;
 	double curTime = 0;
@@ -39,14 +44,26 @@ public class NewAuto {
 	public NewAuto(Robot robot){
 		this.robot = robot;
 	}
+	public void trajectoryGeneration(){
+		String trajectoryJSON = "path\\Users\\Owner\\Documents\\2020\\PathWeaver\\Games";
 
+		try {
+		Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+		Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+		} catch (IOException ex) {
+		DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+		}
+	}
 	public void generateTrajectory() {
+		DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 10);
+		DifferentialDriveVoltageConstraint voltConstraint = new DifferentialDriveVoltageConstraint(robot.motor.driveFeedForward, driveKinematics, 7);	
 		config.addConstraint(driveContraint);
-		config.setReversed(false);
+		config.addConstraint(voltConstraint);
+		config.setReversed(true);
 		var startWaypoint = new Pose2d(Units.feetToMeters(0), Units.feetToMeters(0), Rotation2d.fromDegrees(0));
-		var endWaypoint = new Pose2d(Units.feetToMeters(20), Units.feetToMeters(0), Rotation2d.fromDegrees(0));
+		var endWaypoint = new Pose2d(Units.feetToMeters(0), Units.feetToMeters(10), Rotation2d.fromDegrees(180));
 		var interiorWaypoints = new ArrayList<Translation2d>();
-		//interiorWaypoints.add(new Translation2d(Units.feetToMeters(2), Units.feetToMeters(2)));
+		interiorWaypoints.add(new Translation2d(Units.feetToMeters(-15), Units.feetToMeters(5)));
 		// interiorWaypoints.add(new Translation2d(Units.feetToMeters(0.75), Units.feetToMeters(0)));
 		trajectory = TrajectoryGenerator.generateTrajectory(startWaypoint, interiorWaypoints, endWaypoint, config);
 	}
@@ -55,7 +72,7 @@ public class NewAuto {
 		double time = Timer.getFPGATimestamp() - autoStartTime;
 
 		double rightPosition = robot.motor.rightEncoder.getPosition();
-		double leftPosition = robot.motor.leftEncoder.getPosition();
+		double leftPosition = robot.motor.leftEncoder.getPosition(); //* ((9.0/84.0) * Units.inchesToMeters(6) * Math.PI);
 		driveOdometry.update(Rotation2d.fromDegrees(robot.motor.ahrs.getFusedHeading() * -1), leftPosition, rightPosition);
 
 		Trajectory.State goal = trajectory.sample(time);
@@ -72,8 +89,8 @@ public class NewAuto {
 		
 		prevTime = time;
 		prevSpeeds = wheelSpeeds;
-		System.out.println(goal);
-		System.out.println(driveOdometry.getPoseMeters());
+		System.out.println("goal: " + goal.poseMeters);
+		System.out.println("real: " + driveOdometry.getPoseMeters());
 		if(driveOdometry.getPoseMeters() == goal.poseMeters){
 			robot.pneumatics.CPMSolenoid.set(Value.kForward);
 		}
