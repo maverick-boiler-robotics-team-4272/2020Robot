@@ -52,7 +52,7 @@ public class HwMotor {
 	public final TalonSRX shooter2 = new TalonSRX(16);
 
 	public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
-	public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.211, 0.0295, 0.00628);
+	public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.214/12, 33.9/12, 6.55/12);
 	//Track width 62.405 units?
 
 	NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -63,16 +63,17 @@ public class HwMotor {
 	public NetworkTableEntry ball4 = table.getEntry("BallDStatus");
 	public NetworkTableEntry ball5 = table.getEntry("BallEStatus");
 
-	private double kP = 0;
-	private double kF = 0;
-	private double kI = 0;
-	private double kD = 0;
+	private double kP = 0.3;
+	private double kF = 0.01;
+	private double kI = 0.005;
+    private double kD = 0.025;
+    
 	private double intake_kP = 0;
 	private double intake_kF = 0;
 	private double intake_kI = 0;
 	private double intake_kD = 0;
 
-	private double drivekP = 0;
+	private double drivekP = 1.19;
 	private double drivekI = 0;
 	private double drivekD = 0;
 	private double drivekF = 0;
@@ -93,22 +94,20 @@ public class HwMotor {
 		shooter1.configPeakOutputForward(1, 30);
 		shooter1.configPeakOutputReverse(-1, 30);
 
-		/* Config the Velocity closed loop gains in slot0 */
+		shooter1.configVoltageCompSaturation(12);
+		// shooter2.configVoltageCompSaturation(12);
+        shooter1.enableVoltageCompensation(true);
+        
+        /* Config the Velocity closed loop gains in slot0 */
 		shooter1.config_kP(0, kP, 30);
 		shooter1.config_kF(0, kF, 30);
 		shooter1.config_kI(0, kI, 30);
 		shooter1.config_kD(0, kD, 30); 
+		robot.tables.pre_kP.setDouble(kP);
+		robot.tables.pre_kI.setDouble(kI);
+		robot.tables.pre_kD.setDouble(kD);
+		robot.tables.pre_kF.setDouble(kF);
 
-		shooter1.configVoltageCompSaturation(12);
-		// shooter2.configVoltageCompSaturation(12);
-		shooter1.enableVoltageCompensation(true);
-		
-		robot.tables.pre_kP.setDouble(0.15);
-		robot.tables.pre_kI.setDouble(0.005);
-		robot.tables.pre_kD.setDouble(0.0114);
-		robot.tables.pre_kF.setDouble(0.0101);
-
-		
 		intakePID = intake.getPIDController();
 		
 		intakePID.setOutputRange(-1, 1);
@@ -127,10 +126,16 @@ public class HwMotor {
 		right2.follow(right1);
 		right1.setInverted(true);
 
-		leftEncoder.setVelocityConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI / 60) / 42);
-		rightEncoder.setVelocityConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI / 60) / 42);
-		leftEncoder.setPositionConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI) / 42);
-		rightEncoder.setPositionConversionFactor(((9/84) * Units.inchesToMeters(6) * Math.PI) / 42);
+
+        leftEncoder.setPositionConversionFactor(1);
+        leftEncoder.setVelocityConversionFactor(1);
+        rightEncoder.setPositionConversionFactor(1);
+        rightEncoder.setVelocityConversionFactor(1);
+        
+		leftEncoder.setVelocityConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI / 60.0));
+		rightEncoder.setVelocityConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI / 60.0));
+		leftEncoder.setPositionConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI));
+        rightEncoder.setPositionConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI));
 
 		rightPID.setOutputRange(-1, 1);
 		rightPID.setP(drivekP);
@@ -142,12 +147,17 @@ public class HwMotor {
 		leftPID.setP(drivekP);
 		leftPID.setI(drivekI);
 		leftPID.setD(drivekD);
-		leftPID.setFF(drivekF);
+        leftPID.setFF(drivekF);
+        
+        left1.enableVoltageCompensation(12);
+        left2.enableVoltageCompensation(12);
+        right1.enableVoltageCompensation(12);
+        right2.enableVoltageCompensation(12);
 
-		robot.tables.drivePrekP.setDouble(0);
+		robot.tables.drivePrekP.setDouble(0.0);
 		robot.tables.drivePrekF.setDouble(0.0);
 		robot.tables.drivePrekI.setDouble(0);
-		robot.tables.drivePrekD.setDouble(0);
+		robot.tables.drivePrekD.setDouble(0.0);
 
 		// climberLeft.follow(climberRight);
 		//climberLeft.follow(null);

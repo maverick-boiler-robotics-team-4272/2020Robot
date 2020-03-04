@@ -83,9 +83,11 @@ public class Teleop {
 
 
 		if (robot.jstick.rightJoystick.getTriggerPressed()) {
-			robot.hopper.shoot_balls();
+            robot.hopper.shoot_balls();
+            robot.shooter.startShooter();
 		} else if(robot.jstick.rightJoystick.getTriggerReleased()) {
-			robot.hopper.stop_hopper();
+            robot.hopper.stop_hopper();
+            robot.shooter.stopShooter();
 		}
 
 		if(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15) {

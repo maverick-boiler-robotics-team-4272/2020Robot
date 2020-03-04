@@ -14,7 +14,6 @@ public class AllBot{
 		robot.intake.loop();
 		robot.color.loop();
 		robot.hopper.loop();
-		robot.tables.loop();
 	}
 
 	public void resetAll(){
@@ -25,6 +24,5 @@ public class AllBot{
 		robot.intake.reset();
 		robot.color.reset();
 		robot.hopper.reset();
-		robot.tables.reset();
 	}
 }

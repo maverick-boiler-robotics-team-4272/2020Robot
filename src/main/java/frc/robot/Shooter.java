@@ -9,7 +9,7 @@ public class Shooter {
 	Robot robot;
 	public static final double SENSOR_TO_RPM = 0.07325;
 
-	private double rpm = robot.teleop.rpm;
+	private double rpm = 0;
 
 	private boolean is_shooting = false;
 
@@ -18,6 +18,7 @@ public class Shooter {
 	}
 
 	public void loop(){
+		rpm = robot.teleop.rpm;
 		sendNumbers();
 		if(is_shooting){
 			setShooterRPM();
@@ -39,6 +40,7 @@ public class Shooter {
 	}
 
 	private void setShooterRPM(){
+		System.out.println("setting shooter to run at " + rpm + " rpm");
 		robot.motor.shooter1.set(ControlMode.Velocity, rpm / SENSOR_TO_RPM);
 		robot.tables.shooterVelSetPoint.setNumber(rpm);
 	}

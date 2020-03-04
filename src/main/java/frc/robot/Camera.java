@@ -37,10 +37,7 @@ public class Camera {
 	public void loop(){
 		if(is_aligning){
 			updateLimelightTracking();
-			double leftSpeed = m_LimelightDriveCommand - m_LimelightSteerCommand;
-			double rightSpeed = m_LimelightDriveCommand + m_LimelightSteerCommand;
 			changingLed(true);
-			// robot.teleop.drive(leftSpeed, rightSpeed);
 		} else if(is_driver_vision) {
 			changingLed(false);
 		} else {

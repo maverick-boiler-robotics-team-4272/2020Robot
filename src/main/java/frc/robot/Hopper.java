@@ -124,8 +124,8 @@ public class Hopper {
 
     private void movement(boolean shoot_button, boolean reverse) {
         // readArduino();
-        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.05;
-        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.95;
+        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.02;
+        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.98;
         //if(!reverse){
         if (!shoot_button) {
             if (!shooter_ball) {

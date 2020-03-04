@@ -30,6 +30,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		tables = new NetworkTables(this);
 		teleop = new Teleop(this);
 		auto = new NewAuto(this);
 		motor = new HwMotor(this);
@@ -41,8 +42,9 @@ public class Robot extends TimedRobot {
 		intake = new Intake(this);
 		color = new ColorThing(this);
 		hopper = new Hopper(this);
-		tables = new NetworkTables(this);
 		allbot = new AllBot(this);
+
+		tables.postInit();
 	}
 
 	/**
@@ -91,6 +93,7 @@ public class Robot extends TimedRobot {
 				// Put default auto code here
 				break;
 		}*/
+		allbot.loopAll();
 		auto.loop();
 	}
 
@@ -99,7 +102,9 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		
 		teleop.run();
+		allbot.loopAll();
 	}
 
 	/**
