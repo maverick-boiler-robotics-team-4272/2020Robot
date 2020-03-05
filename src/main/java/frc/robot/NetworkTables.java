@@ -80,7 +80,7 @@ public class NetworkTables {
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
 				double newKI = value.getDouble();
-				robot.motor.shooter1.config_kP(0, newKI, 30);
+				robot.motor.shooter1.config_kI(0, newKI, 30);
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
@@ -90,7 +90,7 @@ public class NetworkTables {
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
 				double newKD = value.getDouble();
-				robot.motor.shooter1.config_kP(0, newKD, 30);
+				robot.motor.shooter1.config_kD(0, newKD, 30);
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);

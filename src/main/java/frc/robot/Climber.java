@@ -37,11 +37,11 @@ public class Climber{
 
 	//extends pneumatic for climber
 	public void up(){
-		robot.pneumatics.climberSolenoid.set(kForward);
+		robot.pneumatics.climberSolenoid.set(kReverse);
 	}
 
 	//retracts pneumatic for climber
 	public void down(){
-		robot.pneumatics.climberSolenoid.set(kReverse);
+		robot.pneumatics.climberSolenoid.set(kForward);
 	}
 }

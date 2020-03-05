@@ -39,20 +39,25 @@ public class NewAuto {
 	DifferentialDriveWheelSpeeds prevSpeeds = new DifferentialDriveWheelSpeeds(0, 0);
 	double prevTime = 0;
 	double curTime = 0;
+	int state = 0;
+	double timeStampLoop2 = 0;
 
 
 	public NewAuto(Robot robot){
 		this.robot = robot;
 	}
-	public void trajectoryGeneration(){
+	public Trajectory trajectoryGeneration(){
 		String trajectoryJSON = "path\\Users\\Owner\\Documents\\2020\\PathWeaver\\Games";
 
 		try {
 		Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
 		Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+		return robot.auto.trajectory;
 		} catch (IOException ex) {
 		DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+		return trajectory;
 		}
+		
 	}
 	public void generateTrajectory() {
 		DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 10);
@@ -93,6 +98,30 @@ public class NewAuto {
 		System.out.println("real: " + driveOdometry.getPoseMeters());
 		if(driveOdometry.getPoseMeters() == goal.poseMeters){
 			robot.pneumatics.CPMSolenoid.set(Value.kForward);
+		}
+	}
+
+	public void loop2(){
+		switch(state){
+			case 0:
+			if(robot.hopper.countBalls() != 0){ // this doesn't work because sometimes the balls are in blindspots
+				robot.shooter.startShooter();
+				robot.hopper.shoot_balls();
+				break;
+			}else{
+				robot.shooter.stopShooter();
+				robot.hopper.stop_hopper();
+				state++;
+			}
+			case 1:
+			timeStampLoop2 = Timer.getFPGATimestamp();
+			robot.teleop.drive(-0.5, -0.5);
+			state++;
+			case 2:
+			if(Timer.getFPGATimestamp() > timeStampLoop2 + 1){
+				robot.teleop.drive(0,0);
+				break;
+			}
 		}
 	}
 

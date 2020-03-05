@@ -63,10 +63,10 @@ public class HwMotor {
 	public NetworkTableEntry ball4 = table.getEntry("BallDStatus");
 	public NetworkTableEntry ball5 = table.getEntry("BallEStatus");
 
-	private double kP = 0.3;
-	private double kF = 0.01;
-	private double kI = 0.005;
-    private double kD = 0.025;
+	private double shooter_kP = 0.3;
+    private double shooter_kI = 0.0;
+    private double shooter_kD = 0.025;
+    private double shooter_kF = 0.01;
     
 	private double intake_kP = 0;
 	private double intake_kF = 0;
@@ -83,7 +83,7 @@ public class HwMotor {
 	public HwMotor(Robot robot) {
 		this.robot = robot;
 		shooter2.follow(shooter1);
-		shooter2.setInverted(InvertType.OpposeMaster);
+		shooter2.setInverted(InvertType.FollowMaster);
 		shooter1.setSensorPhase(false);
 		shooter1.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms);
 		shooter1.configVelocityMeasurementWindow(16);
@@ -92,21 +92,24 @@ public class HwMotor {
 		shooter1.configNominalOutputForward(0, 30);
 		shooter1.configNominalOutputReverse(0, 30);
 		shooter1.configPeakOutputForward(1, 30);
-		shooter1.configPeakOutputReverse(-1, 30);
+        shooter1.configPeakOutputReverse(0, 30);
+        shooter1.configPeakCurrentLimit(80);
+        shooter2.configPeakCurrentLimit(80);
+        // shooter1.configContinuousCurrentLimit();
 
 		shooter1.configVoltageCompSaturation(12);
 		// shooter2.configVoltageCompSaturation(12);
         shooter1.enableVoltageCompensation(true);
         
         /* Config the Velocity closed loop gains in slot0 */
-		shooter1.config_kP(0, kP, 30);
-		shooter1.config_kF(0, kF, 30);
-		shooter1.config_kI(0, kI, 30);
-		shooter1.config_kD(0, kD, 30); 
-		robot.tables.pre_kP.setDouble(kP);
-		robot.tables.pre_kI.setDouble(kI);
-		robot.tables.pre_kD.setDouble(kD);
-		robot.tables.pre_kF.setDouble(kF);
+		shooter1.config_kP(0, shooter_kP, 30);
+		shooter1.config_kF(0, shooter_kF, 30);
+		shooter1.config_kI(0, shooter_kI, 30);
+		shooter1.config_kD(0, shooter_kD, 30); 
+		robot.tables.pre_kP.setDouble(shooter_kP);
+		robot.tables.pre_kI.setDouble(shooter_kI);
+		robot.tables.pre_kD.setDouble(shooter_kD);
+		robot.tables.pre_kF.setDouble(shooter_kF);
 
 		intakePID = intake.getPIDController();
 		
@@ -117,20 +120,14 @@ public class HwMotor {
 		intakePID.setFF(intake_kF);
 		// intake2.follow(intake, true);
 
-		robot.tables.intake_pre_kP.setDouble(0);
-		robot.tables.intake_pre_kF.setDouble(0.000093);
-		robot.tables.intake_pre_kI.setDouble(0);
-		robot.tables.intake_pre_kD.setDouble(0);
+		robot.tables.intake_pre_kP.setDouble(intake_kP);
+		robot.tables.intake_pre_kF.setDouble(intake_kI);
+		robot.tables.intake_pre_kI.setDouble(intake_kD);
+		robot.tables.intake_pre_kD.setDouble(intake_kF);
 
 		left2.follow(left1);
 		right2.follow(right1);
 		right1.setInverted(true);
-
-
-        leftEncoder.setPositionConversionFactor(1);
-        leftEncoder.setVelocityConversionFactor(1);
-        rightEncoder.setPositionConversionFactor(1);
-        rightEncoder.setVelocityConversionFactor(1);
         
 		leftEncoder.setVelocityConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI / 60.0));
 		rightEncoder.setVelocityConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI / 60.0));
@@ -154,10 +151,10 @@ public class HwMotor {
         right1.enableVoltageCompensation(12);
         right2.enableVoltageCompensation(12);
 
-		robot.tables.drivePrekP.setDouble(0.0);
-		robot.tables.drivePrekF.setDouble(0.0);
-		robot.tables.drivePrekI.setDouble(0);
-		robot.tables.drivePrekD.setDouble(0.0);
+		robot.tables.drivePrekP.setDouble(drivekP);
+		robot.tables.drivePrekF.setDouble(drivekF);
+		robot.tables.drivePrekI.setDouble(drivekI);
+		robot.tables.drivePrekD.setDouble(drivekD);
 
 		// climberLeft.follow(climberRight);
 		//climberLeft.follow(null);
@@ -174,7 +171,7 @@ public class HwMotor {
 		hopper.setSmartCurrentLimit(30);
 		hopper_infeed.setSmartCurrentLimit(30);
 
-		CPM.setSmartCurrentLimit(40);
+		CPM.setSmartCurrentLimit(30);
 
 		left1.setSmartCurrentLimit(70);
 		left2.setSmartCurrentLimit(70);
@@ -206,9 +203,5 @@ public class HwMotor {
 	public void setRightVelocity(double rpmSetpoint, double feedforward){
 		rightPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
 		robot.tables.rightDriveVelSetpoint.setNumber(rpmSetpoint);
-	}
-
-	public void climberExtend(double power){
-		climberRight.set(power);
 	}
 }

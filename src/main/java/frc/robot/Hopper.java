@@ -71,10 +71,9 @@ public class Hopper {
             disable();
         }
         this.rpm = robot.teleop.rpm;
-        if(!is_shooting || !is_intaking){
-            if(Timer.getFPGATimestamp() - current_intake_time >= 1){
-                stop_hopper();
-            }
+        if(!is_shooting && Timer.getFPGATimestamp() - current_intake_time > 1) {
+            stop_hopper();
+            current_intake_time = 0;
         }
     }
 
@@ -87,6 +86,26 @@ public class Hopper {
         robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_b);
         robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_c);
         robot.motor.ball5.setBoolean(robot.hopper.shooter_ball);
+    }
+
+    public int countBalls(){
+        int numberBalls = 0;
+        if(intake_to_hopper_sensor){
+            numberBalls++;
+        }
+        if(hopper_ball_a){
+            numberBalls++;
+        }
+        if(hopper_ball_b){
+            numberBalls++;
+        }
+        if(hopper_ball_c){
+            numberBalls++;
+        }
+        if(shooter_ball){
+            numberBalls++;
+        }
+        return numberBalls;
     }
 
     //the below functions are to make sure loop does not break and so teleop can call it
@@ -118,8 +137,10 @@ public class Hopper {
         is_reversing = true;
     }
 
-    public void stop_intaking(){
-        current_intake_time = Timer.getFPGATimestamp();
+    public void stop_intaking() {
+        if(current_intake_time == 0){
+            current_intake_time = Timer.getFPGATimestamp();
+        }
     }
 
     private void movement(boolean shoot_button, boolean reverse) {

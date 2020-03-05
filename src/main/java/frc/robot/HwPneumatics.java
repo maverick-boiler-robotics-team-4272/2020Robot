@@ -12,9 +12,9 @@ public class HwPneumatics {
 	public double current = c.getCompressorCurrent();
 	
 
-	public DoubleSolenoid climberSolenoid = new DoubleSolenoid(1, 6);
+	public DoubleSolenoid climberSolenoid = new DoubleSolenoid(3, 4);
 	public DoubleSolenoid intakeSolenoid = new DoubleSolenoid(2, 5);
-	public DoubleSolenoid CPMSolenoid = new DoubleSolenoid(3, 4);
+	public DoubleSolenoid CPMSolenoid = new DoubleSolenoid(1, 6);
 	public Solenoid extra = new Solenoid(0);
 
 	public HwPneumatics(){

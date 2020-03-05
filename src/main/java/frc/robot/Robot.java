@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		// m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
 		auto.startAuto();
-		auto.generateTrajectory();
+		// auto.generateTrajectory();
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
 				break;
 		}*/
 		allbot.loopAll();
-		auto.loop();
+		auto.loop2();
 	}
 
 	/**
