@@ -12,7 +12,7 @@ public class AllBot{
 		robot.shooter.loop();
 		robot.climber.loop();
 		robot.intake.loop();
-		robot.color.loop();
+		// robot.color.loop();
 		robot.hopper.loop();
 	}
 
@@ -22,7 +22,7 @@ public class AllBot{
 		robot.shooter.reset();
 		robot.climber.reset();
 		robot.intake.reset();
-		robot.color.reset();
+		// robot.color.reset();
 		robot.hopper.reset();
 	}
 }

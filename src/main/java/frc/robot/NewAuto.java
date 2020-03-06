@@ -41,6 +41,7 @@ public class NewAuto {
 	double curTime = 0;
 	int state = 0;
 	double timeStampLoop2 = 0;
+	double shootCountdown = 0;
 
 
 	public NewAuto(Robot robot){
@@ -86,11 +87,10 @@ public class NewAuto {
 		double dt = time - prevTime;
 		double leftVelocity = wheelSpeeds.leftMetersPerSecond;
 		double rightVelocity = wheelSpeeds.rightMetersPerSecond;
-		double leftFeedforward = robot.motor.driveFeedForward.calculate(leftVelocity, (leftVelocity - prevSpeeds.leftMetersPerSecond) / dt);
-		double rightFeedforward = robot.motor.driveFeedForward.calculate(rightVelocity, (rightVelocity - prevSpeeds.rightMetersPerSecond) / dt);
-		
-		robot.motor.setRightVelocity(rightVelocity, rightFeedforward);
-		robot.motor.setLeftVelocity(leftVelocity, leftFeedforward);
+		double rightAcceleration = (rightVelocity - prevSpeeds.rightMetersPerSecond) / dt;
+		double leftAcceleration = (leftVelocity - prevSpeeds.rightMetersPerSecond) / dt;
+		robot.motor.setRightVelocity(rightVelocity, rightAcceleration);
+		robot.motor.setLeftVelocity(leftVelocity, leftAcceleration);
 		
 		prevTime = time;
 		prevSpeeds = wheelSpeeds;
@@ -105,20 +105,24 @@ public class NewAuto {
 		switch(state){
 			case 0:
 			if(robot.hopper.countBalls() != 0){ // this doesn't work because sometimes the balls are in blindspots
+				robot.teleop.rpm = 3650;
 				robot.shooter.startShooter();
 				robot.hopper.shoot_balls();
+				shootCountdown = Timer.getFPGATimestamp();
 				break;
-			}else{
+			}else if(Timer.getFPGATimestamp() > (shootCountdown + 2.0)){
 				robot.shooter.stopShooter();
 				robot.hopper.stop_hopper();
+				robot.teleop.rpm = 4000;
 				state++;
 			}
+			break;
 			case 1:
 			timeStampLoop2 = Timer.getFPGATimestamp();
-			robot.teleop.drive(-0.5, -0.5);
+			robot.teleop.drive(0.7, 0.5);
 			state++;
 			case 2:
-			if(Timer.getFPGATimestamp() > timeStampLoop2 + 1){
+			if(Timer.getFPGATimestamp() > timeStampLoop2 + 0.5){
 				robot.teleop.drive(0,0);
 				break;
 			}
@@ -130,6 +134,7 @@ public class NewAuto {
 		robot.motor.rightEncoder.setPosition(0);
 		driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
 		autoStartTime = Timer.getFPGATimestamp();
+		state = 0;
 	}
 
 }

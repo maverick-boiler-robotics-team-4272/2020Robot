@@ -68,17 +68,18 @@ public class Teleop {
 		}
         
         // robot.camera.loop();
-        if(robot.camera.is_aligning) {
-            leftSpeed = robot.camera.m_LimelightDriveCommand - robot.camera.m_LimelightSteerCommand;
-			rightSpeed = robot.camera.m_LimelightDriveCommand + robot.camera.m_LimelightSteerCommand;
-        }
-
-		drive(leftSpeed, rightSpeed);
+        // if(robot.camera.is_aligning) {
+        //     leftSpeed = robot.camera.m_LimelightDriveCommand - robot.camera.m_LimelightSteerCommand;
+		// 	rightSpeed = robot.camera.m_LimelightDriveCommand + robot.camera.m_LimelightSteerCommand;
+        // }
+		
 		
 		if (robot.jstick.leftJoystick.getTrigger()) {
 			robot.camera.autoAlign();
 		}else if(robot.jstick.leftJoystick.getTriggerReleased()){
 			robot.camera.driveVision();
+		}else{
+			drive(leftSpeed, rightSpeed);
 		}
 
 
@@ -90,13 +91,16 @@ public class Teleop {
             robot.shooter.stopShooter();
 		}
 
-		if(robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15) {
+		if((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15)) {
 			robot.hopper.intake_balls();
-
-			if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15) {
-				robot.intake.on(((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15) * 0.75);
-			}else {
-				robot.intake.on((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) - 0.15) * 0.75);
+			if(robot.hopper.countBalls() < 5){
+				if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15) {
+					robot.intake.on(((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15) * 0.75);
+				}else {
+					robot.intake.on((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) - 0.15) * 0.75);
+				}
+			}else{
+				robot.intake.off();
 			}
 		} else {
 			robot.hopper.stop_intaking();
@@ -127,10 +131,16 @@ public class Teleop {
 			} else if (robot.jstick.xbox.getYButtonPressed()) {
 				robot.climber.toggle();
 			} else if (robot.jstick.xbox.getXButton()) {
-				robot.color.doTheColorPosition();
+				// robot.color.doTheColorPosition();
 			}
 		} else {
-			robot.color.colorRotation(robot.jstick.xbox.getAButton()); //check with operator to see what button they want assigned to this
+			// robot.color.colorRotation(robot.jstick.xbox.getAButton()); //check with operator to see what button they want assigned to this
+			if(robot.jstick.xbox.getYButtonPressed()){
+				// robot.color.doTheColorPosition();
+				robot.motor.CPM.set(0.3);
+			}else if(robot.jstick.xbox.getYButtonReleased()){
+				robot.motor.CPM.set(0);
+			}
 		}
 
 		if(Math.abs(robot.jstick.xbox.getY(Hand.kRight)) > 0.2){

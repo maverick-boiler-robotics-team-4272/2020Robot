@@ -14,6 +14,13 @@ public class Camera {
 
 	public boolean is_aligning = false;
 	private boolean is_driver_vision = true;
+	final double STEER_K = 0.02; // max speed the robot should turn
+	double steerI = 0.001;
+	double accumulator = 0;
+	double accumulatorMax = 2;
+	double accumulatorMin = -2;
+	double leftMotorSetpoint = 0;
+	double rightMotorSetpoint = 0;
 
 	public Camera(Robot robot) {
 		this.robot = robot;
@@ -30,7 +37,7 @@ public class Camera {
 			numero = 1;
 		}
 		//publish led status to limelight network table
-		robot.tables.limelightLed.setNumber(numero);
+		robot.tables.limelightLed.setNumber(3);
 		
 	}
 
@@ -60,10 +67,10 @@ public class Camera {
 	}
 
 	public void updateLimelightTracking(){
-		final double STEER_K = 0.005; // max speed the robot should turn
 		final double DRIVE_K = -0.26; // the feed foreward for the robot drive
 		final double DESIRED_TARGET_Y = -7; // the target y value given from limelight
 		final double MAX_DRIVE = 0.1; // max speed the robot should drive
+		
 
 
 		//getting current network table entries
@@ -90,7 +97,17 @@ public class Camera {
 		m_LimelightHasValidTarget = true; //has a valid target
 
 
-		double steer_cmd = tx * STEER_K; //how fast it should steer
+		double steer_cmd = tx * STEER_K + accumulator * steerI; // how fast it should steer
 		m_LimelightSteerCommand = steer_cmd; // puts the above into an other more different variable
+		accumulator += tx;
+		if(accumulator > accumulatorMax){
+			accumulator = accumulatorMax;
+		}else if(accumulator < accumulatorMin){
+			accumulator = accumulatorMin;
+		}
+		leftMotorSetpoint = m_LimelightDriveCommand - m_LimelightSteerCommand;
+		rightMotorSetpoint = m_LimelightDriveCommand + m_LimelightSteerCommand;
+		robot.motor.setLeftVelocity(leftMotorSetpoint, 0);
+		robot.motor.setRightVelocity(rightMotorSetpoint, 0);
 	}
 }

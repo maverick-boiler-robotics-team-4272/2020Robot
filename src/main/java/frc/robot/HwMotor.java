@@ -195,13 +195,15 @@ public class HwMotor {
 		right2.burnFlash();
 	}
 
-	public void setLeftVelocity(double rpmSetpoint, double feedforward){
-		leftPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
-		robot.tables.leftDriveVelSetpoint.setNumber(rpmSetpoint);
+	public void setLeftVelocity(double velocity, double acceleration){
+		double feedforward = driveFeedForward.calculate(velocity, acceleration);
+		leftPID.setReference(velocity, ControlType.kVelocity, 0, feedforward);
+		robot.tables.leftDriveVelSetpoint.setNumber(velocity);
 	}
 
-	public void setRightVelocity(double rpmSetpoint, double feedforward){
-		rightPID.setReference(rpmSetpoint, ControlType.kVelocity, 0, feedforward);
-		robot.tables.rightDriveVelSetpoint.setNumber(rpmSetpoint);
+	public void setRightVelocity(double velocity, double acceleration){
+		double feedforward = driveFeedForward.calculate(velocity, acceleration);
+		rightPID.setReference(velocity, ControlType.kVelocity, 0, feedforward);
+		robot.tables.rightDriveVelSetpoint.setNumber(velocity);
 	}
 }
