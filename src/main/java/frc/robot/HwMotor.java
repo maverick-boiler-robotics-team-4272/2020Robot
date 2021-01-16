@@ -2,11 +2,14 @@ package frc.robot;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
@@ -83,11 +86,11 @@ public class HwMotor {
 	public HwMotor(Robot robot) {
 		this.robot = robot;
 		shooter2.follow(shooter1);
-		shooter2.setInverted(InvertType.FollowMaster);
-		shooter1.setSensorPhase(false);
+		shooter2.setInverted(InvertType.OpposeMaster);
+		shooter1.setSensorPhase(true);
 		shooter1.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms);
 		shooter1.configVelocityMeasurementWindow(16);
-		shooter1.setInverted(false);
+		shooter1.setInverted(true);
 		
 		shooter1.configNominalOutputForward(0, 30);
 		shooter1.configNominalOutputReverse(0, 30);
@@ -97,9 +100,11 @@ public class HwMotor {
         shooter2.configPeakCurrentLimit(80);
         // shooter1.configContinuousCurrentLimit();
 
-		shooter1.configVoltageCompSaturation(12);
-		// shooter2.configVoltageCompSaturation(12);
-        shooter1.enableVoltageCompensation(true);
+		shooter1.configVoltageCompSaturation(11.5);
+		shooter2.configVoltageCompSaturation(11.5);
+		shooter1.enableVoltageCompensation(true);
+		
+		shooter1.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 5);
         
         /* Config the Velocity closed loop gains in slot0 */
 		shooter1.config_kP(0, shooter_kP, 30);
@@ -156,13 +161,13 @@ public class HwMotor {
 		robot.tables.drivePrekI.setDouble(drivekI);
 		robot.tables.drivePrekD.setDouble(drivekD);
 
-		// climberLeft.follow(climberRight);
-		//climberLeft.follow(null);
-		// climberLeft.setInverted(true);
 		climberLeft.getEncoder().setPosition(0);
 		climberRight.getEncoder().setPosition(0);
-		climberLeft.setSoftLimit(SoftLimitDirection.kForward, 20);
-		climberRight.setSoftLimit(SoftLimitDirection.kForward, 20);
+		climberLeft.setSoftLimit(SoftLimitDirection.kReverse, 0.5f);
+		climberRight.setSoftLimit(SoftLimitDirection.kReverse, 0.5f);
+
+		climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		climberRight.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
 		intake.setSmartCurrentLimit(40, 20, 1000);
 		intake2.setSmartCurrentLimit(40, 20, 1000);
@@ -172,6 +177,7 @@ public class HwMotor {
 		hopper_infeed.setSmartCurrentLimit(30);
 
 		CPM.setSmartCurrentLimit(30);
+		CPM.setIdleMode(IdleMode.kBrake);
 
 		left1.setSmartCurrentLimit(70);
 		left2.setSmartCurrentLimit(70);

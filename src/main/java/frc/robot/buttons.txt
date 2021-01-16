@@ -17,25 +17,25 @@ xbox controller:
 		back button = disable shooter wheel
 		start button = start shooter wheel
   
-		left bumper = toggle led on or off
+		// left bumper = toggle led on or off
 
 		left trigger = intake stuff
 		
 
 	right side:
 	
-		y button = climber pneumatics
+		y button = Manual CPM movement
 
-		a button = start rotation for stage two on color wheel
+		a button = manual spin the CPM for position
 
 		right bumper = toggle limelight pipeline
 
 		x button pressed does intake/hopper cool stuff
 
 		right trigger with other buttons:
-			a pressed
-			x pressed = color position
-			b pressed CPM pneumatics
-			y pressed Climber pneumatics
+			a pressed = intake pneumatics
+			x pressed = color rotation
+			b pressed = CPM pneumatics
+			y pressed = Climber pneumatics
 		   
-just testing #2 :)
+just testing #2 

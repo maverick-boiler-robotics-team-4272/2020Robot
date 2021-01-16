@@ -203,7 +203,7 @@ public class Hopper {
                 }
             }
         } else {
-            if (robot.motor.shooter1.getSelectedSensorVelocity() >= lowerDifference && robot.motor.shooter1.getSelectedSensorVelocity() <= upperDifference){
+            if (robot.teleop.sendIt || (robot.motor.shooter1.getSelectedSensorVelocity() >= lowerDifference && robot.motor.shooter1.getSelectedSensorVelocity() <= upperDifference)){
                 shooter_infeed.set(-1);
                 hopper_infeed.set(-0.2);
                 hopper.set(-0.2);

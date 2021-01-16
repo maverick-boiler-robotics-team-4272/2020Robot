@@ -42,6 +42,8 @@ public class NewAuto {
 	int state = 0;
 	double timeStampLoop2 = 0;
 	double shootCountdown = 0;
+	double alignTime = 0;
+	double intakeTime = 0;
 
 
 	public NewAuto(Robot robot){
@@ -119,13 +121,74 @@ public class NewAuto {
 			break;
 			case 1:
 			timeStampLoop2 = Timer.getFPGATimestamp();
-			robot.teleop.drive(0.7, 0.5);
+			robot.teleop.drive(0.5, 0.5);
 			state++;
 			case 2:
 			if(Timer.getFPGATimestamp() > timeStampLoop2 + 0.5){
 				robot.teleop.drive(0,0);
 				break;
 			}
+		}
+	}
+	
+	public void loop3(){
+		switch(state){
+			case 0:
+			if(robot.hopper.countBalls() != 0){ // this doesn't work because sometimes the balls are in blindspots
+				robot.teleop.rpm = 3650;
+				robot.shooter.startShooter();
+				robot.hopper.shoot_balls();
+				shootCountdown = Timer.getFPGATimestamp();
+				break;
+			}else if(Timer.getFPGATimestamp() > (shootCountdown + 2.0)){
+				robot.shooter.stopShooter();
+				robot.hopper.stop_hopper();
+				robot.teleop.rpm = 4000;
+				state++;
+			}
+			break;
+			case 1:
+			timeStampLoop2 = Timer.getFPGATimestamp();
+			robot.teleop.drive(0.5, 0.7);
+			state++;
+			break;
+			case 2:
+			if(Timer.getFPGATimestamp() > timeStampLoop2 + 0.5){
+				robot.teleop.drive(0.2, 0.2);
+				robot.hopper.intake_balls();
+				robot.intake.on(0.5);
+				intakeTime = Timer.getFPGATimestamp();
+				state++;
+			}
+			break;
+			case 3:
+			if(robot.hopper.countBalls() >= 3 || Timer.getFPGATimestamp() > intakeTime + 2){
+				robot.teleop.drive(0, 0);
+				// robot.camera.autoAlign();
+				robot.hopper.stop_intaking();
+				robot.intake.off();
+				// state++;
+			}else{
+				break;
+			}
+			break;
+		
+			// case 4:
+			// alignTime = Timer.getFPGATimestamp();
+			// state++;
+			// break;
+			// case 5:
+			// if(Timer.getFPGATimestamp() >= alignTime + 1.0 && robot.hopper.countBalls() != 0){
+			// 	// robot.camera.driveVision();
+			// 	robot.hopper.shoot_balls();
+			// 	robot.shooter.startShooter();
+			// 	shootCountdown = Timer.getFPGATimestamp();
+			// }else if(robot.hopper.countBalls() == 0 && (Timer.getFPGATimestamp() > shootCountdown + 2)){
+			// 	robot.hopper.stop_hopper();
+			// 	robot.shooter.startShooter();
+			// 	break;
+			// }
+			// break;
 		}
 	}
 
@@ -135,6 +198,7 @@ public class NewAuto {
 		driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
 		autoStartTime = Timer.getFPGATimestamp();
 		state = 0;
+		robot.intake.toggle();
 	}
 
 }

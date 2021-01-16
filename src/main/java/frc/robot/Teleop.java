@@ -1,6 +1,8 @@
 package frc.robot;
 
 
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
@@ -16,13 +18,20 @@ public class Teleop {
 
 	boolean is_auto = false;
 	double percentOutput = 0;
-	public double rpm = 4000;
+	public double rpm = 3850;
+	public double rpmHigh = 3825;
+	public double rpmLow = 3650;
 	boolean shootActive = false;
 	private boolean climber_current_pos = false; // false is retracted true is extended
 	public static boolean colorSelectionTime = false;
 	boolean is_reversing = false;
 
 	boolean current_intake_pos = false; //false is retracted
+	double cpmEncoderStart = 0;
+	double cpmEncoderEnd = 150;
+	boolean colorRotation = false;
+
+	public boolean sendIt;
 
 	// public static boolean reversing = false;
 
@@ -82,14 +91,26 @@ public class Teleop {
 			drive(leftSpeed, rightSpeed);
 		}
 
+		if(robot.jstick.rightJoystick.getTopPressed()){
+			rpm = rpmLow;
+			robot.hopper.shoot_balls();
+			robot.shooter.startShooter();
+		}else if(robot.jstick.rightJoystick.getTopReleased()){
+			robot.hopper.stop_hopper();
+			robot.shooter.stopShooter();
+		}
+
 
 		if (robot.jstick.rightJoystick.getTriggerPressed()) {
+			rpm = rpmHigh;
             robot.hopper.shoot_balls();
             robot.shooter.startShooter();
 		} else if(robot.jstick.rightJoystick.getTriggerReleased()) {
             robot.hopper.stop_hopper();
             robot.shooter.stopShooter();
 		}
+
+		this.sendIt = robot.jstick.leftJoystick.getTop();
 
 		if((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15)) {
 			robot.hopper.intake_balls();
@@ -130,35 +151,63 @@ public class Teleop {
 				robot.pneumatics.CPMPneumatics(true);
 			} else if (robot.jstick.xbox.getYButtonPressed()) {
 				robot.climber.toggle();
-			} else if (robot.jstick.xbox.getXButton()) {
-				// robot.color.doTheColorPosition();
+			} else if (robot.jstick.xbox.getXButtonPressed()) {
+				colorRotationInit();
+				colorRotation = true;
 			}
 		} else {
 			// robot.color.colorRotation(robot.jstick.xbox.getAButton()); //check with operator to see what button they want assigned to this
 			if(robot.jstick.xbox.getYButtonPressed()){
 				// robot.color.doTheColorPosition();
-				robot.motor.CPM.set(0.3);
+				robot.motor.CPM.set(0.7);
 			}else if(robot.jstick.xbox.getYButtonReleased()){
 				robot.motor.CPM.set(0);
 			}
 		}
 
+		if(colorRotation){
+			colorRotation();
+		}
+
 		if(Math.abs(robot.jstick.xbox.getY(Hand.kRight)) > 0.2){
 			robot.motor.climberRight.set(robot.jstick.xbox.getY(Hand.kRight) * -1);
+			System.out.println(robot.motor.climberRight.getEncoder().getPosition());
 		}else{
 			robot.motor.climberRight.set(0);
 		}
 		if(Math.abs(robot.jstick.xbox.getY(Hand.kLeft)) > 0.2){
 			robot.motor.climberLeft.set(robot.jstick.xbox.getY(Hand.kLeft) * -1);
+			System.out.println(robot.motor.climberLeft.getEncoder().getPosition());
 		}else{
 			robot.motor.climberLeft.set(0);
 		}
 
-		// robot.hopper.loop(rpm);
+		if(robot.jstick.leftJoystick.getRawButtonPressed(16)) {
+			robot.motor.climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, false);
+			robot.motor.climberRight.enableSoftLimit(SoftLimitDirection.kReverse, false);
+			System.out.println("disabled climber limits!!!");
+		} else if(robot.jstick.leftJoystick.getRawButtonReleased(16)) {
+			robot.motor.climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, true);
+			robot.motor.climberRight.enableSoftLimit(SoftLimitDirection.kReverse, true);
+			System.out.println("re-enabled climber limits");
+		}
 	}
 
 	public void drive(double leftPower, double rightPower) {
 		robot.motor.left1.set(leftPower);
 		robot.motor.right1.set(rightPower);
+	}
+
+	public void colorRotation(){
+		if(robot.motor.CPM.getEncoder().getPosition() < cpmEncoderStart + cpmEncoderEnd){
+			robot.motor.CPM.set(0.7);
+		}else{
+			robot.motor.CPM.set(0);
+			colorRotation = false;
+		}
+	}
+
+	public void colorRotationInit(){
+		cpmEncoderStart = robot.motor.CPM.getEncoder().getPosition();
 	}
 }

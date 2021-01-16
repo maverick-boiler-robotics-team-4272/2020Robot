@@ -27,6 +27,8 @@ public class NetworkTables {
 	public NetworkTableEntry intakeTemp = table.getEntry("IntakeTemp");
 	public NetworkTableEntry shooterOutput = table.getEntry("ShooterOutput");
 	public NetworkTableEntry shooterVelSetPoint = table.getEntry("ShooterVelocitySetPoint");
+	public NetworkTableEntry shooterVelHigh = table.getEntry("shooterVelSetpoint");
+	public NetworkTableEntry shooterVelLow = table.getEntry("shooterVelLow");
 	public NetworkTableEntry drivePrekP = table.getEntry("drivekP");
 	public NetworkTableEntry drivePrekI = table.getEntry("drivekI");
 	public NetworkTableEntry drivePrekD = table.getEntry("drivekD");
@@ -179,12 +181,22 @@ public class NetworkTables {
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-		table.addEntryListener("targetVeloc", new TableEntryListener() {
+		table.addEntryListener("shooterVelHigh", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
-				double TargetVeloc = value.getDouble();
-				robot.teleop.rpm = TargetVeloc;
+				double shooterVelHigh = value.getDouble();
+				robot.teleop.rpmHigh = shooterVelHigh;
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		table.addEntryListener("shooterVelLow", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				double shooterVelLow = value.getDouble();
+				robot.teleop.rpmLow =  shooterVelLow;
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
