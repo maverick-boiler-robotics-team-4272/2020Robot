@@ -29,10 +29,14 @@ public class NetworkTables {
 	public NetworkTableEntry shooterVelSetPoint = table.getEntry("ShooterVelocitySetPoint");
 	public NetworkTableEntry shooterVelHigh = table.getEntry("shooterVelSetpoint");
 	public NetworkTableEntry shooterVelLow = table.getEntry("shooterVelLow");
-	public NetworkTableEntry drivePrekP = table.getEntry("drivekP");
-	public NetworkTableEntry drivePrekI = table.getEntry("drivekI");
-	public NetworkTableEntry drivePrekD = table.getEntry("drivekD");
-	public NetworkTableEntry drivePrekF = table.getEntry("drivekF");
+	public NetworkTableEntry leftdrivePrekP = table.getEntry("leftdrivekP");
+	public NetworkTableEntry leftdrivePrekI = table.getEntry("leftdrivekI");
+	public NetworkTableEntry leftdrivePrekD = table.getEntry("leftdrivekD");
+	public NetworkTableEntry leftdrivePrekF = table.getEntry("leftdrivekF");
+	public NetworkTableEntry rightdrivePrekP = table.getEntry("rightdrivekP");
+	public NetworkTableEntry rightdrivePrekI = table.getEntry("rightdrivekI");
+	public NetworkTableEntry rightdrivePrekD = table.getEntry("rightdrivekD");
+	public NetworkTableEntry rightdrivePrekF = table.getEntry("rightdrivekF");
 	public NetworkTableEntry rightDriveVel = table.getEntry("rightDriveVelocity");
 	public NetworkTableEntry rightDriveOutput = table.getEntry("rightDriveOutput");
 	public NetworkTableEntry rightDriveVelSetpoint = table.getEntry("rightSetpointReadout");
@@ -137,49 +141,91 @@ public class NetworkTables {
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-		table.addEntryListener("drivekP", new TableEntryListener() {
+		table.addEntryListener("leftdrivekP", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
 				double driveNewKP = value.getDouble();
-				robot.motor.rightPID.setP(driveNewKP);
 				robot.motor.leftPID.setP(driveNewKP);
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-		table.addEntryListener("drivekI", new TableEntryListener() {
+		table.addEntryListener("leftdrivekI", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
 				double driveNewKI = value.getDouble();
-				robot.motor.rightPID.setI(driveNewKI);
 				robot.motor.leftPID.setI(driveNewKI);
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-		table.addEntryListener("drivekD", new TableEntryListener() {
+		table.addEntryListener("leftdrivekD", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
 				double driveNewKD = value.getDouble();
-				robot.motor.rightPID.setD(driveNewKD);
 				robot.motor.leftPID.setD(driveNewKD);
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-		table.addEntryListener("drivekF", new TableEntryListener() {
+		table.addEntryListener("leftdrivekF", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				double driveNewKF = value.getDouble();
+				robot.motor.leftPID.setFF(driveNewKF);
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		
+
+		table.addEntryListener("rightdrivekP", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				double driveNewKP = value.getDouble();
+				robot.motor.rightPID.setP(driveNewKP);
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		table.addEntryListener("rightdrivekI", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				double driveNewKI = value.getDouble();
+				robot.motor.rightPID.setI(driveNewKI);
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		table.addEntryListener("rightdrivekD", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				double driveNewKD = value.getDouble();
+				robot.motor.rightPID.setD(driveNewKD);
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		table.addEntryListener("rightdrivekF", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
 				double driveNewKF = value.getDouble();
 				robot.motor.rightPID.setFF(driveNewKF);
-				robot.motor.leftPID.setFF(driveNewKF);
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+
+
+
 
 		table.addEntryListener("shooterVelHigh", new TableEntryListener() {
 			@Override

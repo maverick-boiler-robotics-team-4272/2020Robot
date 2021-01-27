@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
 	public HwPneumatics pneumatics;
 	public Climber climber;
 	public Intake intake;
-	public ColorThing color;
+	// public ColorThing color;
 	public Hopper hopper;
 	public NewAuto auto;
 	public NetworkTables tables;
@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 		pneumatics = new HwPneumatics();
 		climber = new Climber(this);
 		intake = new Intake(this);
-		color = new ColorThing(this);
+		// color = new ColorThing(this);
 		hopper = new Hopper(this);
 		allbot = new AllBot(this);
 
@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
 				break;
 		}*/
 		allbot.loopAll();
-		auto.loop2();
+		auto.loop();
 	}
 
 	/**

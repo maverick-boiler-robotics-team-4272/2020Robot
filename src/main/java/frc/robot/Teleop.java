@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  * Add your docs here.
  */
 public class Teleop {
-	private final double deadzone = 0.05;
+	private final double deadzone = 0.1;
 	Robot robot;
 	
 	public Teleop(Robot robot){
@@ -32,6 +32,11 @@ public class Teleop {
 	boolean colorRotation = false;
 
 	public boolean sendIt;
+
+	// boolean wasZeroRight = true;
+	// double rightAcceleration = 0;
+	// boolean wasZeroLeft = true;
+	// double leftAcceleration = 0;
 
 	// public static boolean reversing = false;
 
@@ -193,9 +198,14 @@ public class Teleop {
 		}
 	}
 
+	// public void drive(double leftPower, double rightPower) {
+	// 	robot.motor.left1.set(leftPower);
+	// 	robot.motor.right1.set(rightPower);
+	// }
+
 	public void drive(double leftPower, double rightPower) {
-		robot.motor.left1.set(leftPower);
-		robot.motor.right1.set(rightPower);
+		robot.motor.setLeftVelocity(leftPower*2, 0);
+		robot.motor.setRightVelocity(rightPower*2, 0);
 	}
 
 	public void colorRotation(){

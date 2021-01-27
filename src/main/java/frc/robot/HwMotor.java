@@ -55,7 +55,7 @@ public class HwMotor {
 	public final TalonSRX shooter2 = new TalonSRX(16);
 
 	public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
-	public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.214/12, 33.9/12, 6.55/12);
+	public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.221, 2.54, 0.513);
 	//Track width 62.405 units?
 
 	NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -76,10 +76,15 @@ public class HwMotor {
 	private double intake_kI = 0;
 	private double intake_kD = 0;
 
-	private double drivekP = 1.19;
-	private double drivekI = 0;
-	private double drivekD = 0;
-	private double drivekF = 0;
+	private double leftDrivekP = 1.19;
+	private double leftDrivekI = 0;
+	private double leftDrivekD = 0;
+	private double leftDrivekF = 0;
+
+	private double rightDrivekP = 1.19;
+	private double rightDrivekI = 0;
+	private double rightDrivekD = 0;
+	private double rightDrivekF = 0;
 
 
 
@@ -140,26 +145,31 @@ public class HwMotor {
         rightEncoder.setPositionConversionFactor(((9.0/84.0) * Units.inchesToMeters(6) * Math.PI));
 
 		rightPID.setOutputRange(-1, 1);
-		rightPID.setP(drivekP);
-		rightPID.setI(drivekI);
-		rightPID.setD(drivekD);
-		rightPID.setFF(drivekF);
+		rightPID.setP(rightDrivekP);
+		rightPID.setI(rightDrivekI);
+		rightPID.setD(rightDrivekD);
+		rightPID.setFF(rightDrivekF);
 		
 		leftPID.setOutputRange(-1, 1);
-		leftPID.setP(drivekP);
-		leftPID.setI(drivekI);
-		leftPID.setD(drivekD);
-        leftPID.setFF(drivekF);
+		leftPID.setP(leftDrivekP);
+		leftPID.setI(leftDrivekI);
+		leftPID.setD(leftDrivekD);
+        leftPID.setFF(leftDrivekF);
         
         left1.enableVoltageCompensation(12);
         left2.enableVoltageCompensation(12);
         right1.enableVoltageCompensation(12);
         right2.enableVoltageCompensation(12);
 
-		robot.tables.drivePrekP.setDouble(drivekP);
-		robot.tables.drivePrekF.setDouble(drivekF);
-		robot.tables.drivePrekI.setDouble(drivekI);
-		robot.tables.drivePrekD.setDouble(drivekD);
+		robot.tables.leftdrivePrekP.setDouble(leftDrivekP);
+		robot.tables.leftdrivePrekF.setDouble(leftDrivekF);
+		robot.tables.leftdrivePrekI.setDouble(leftDrivekI);
+		robot.tables.leftdrivePrekD.setDouble(leftDrivekD);
+
+		robot.tables.rightdrivePrekP.setDouble(rightDrivekP);
+		robot.tables.rightdrivePrekF.setDouble(rightDrivekF);
+		robot.tables.rightdrivePrekI.setDouble(rightDrivekI);
+		robot.tables.rightdrivePrekD.setDouble(rightDrivekD);
 
 		climberLeft.getEncoder().setPosition(0);
 		climberRight.getEncoder().setPosition(0);

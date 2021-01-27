@@ -19,7 +19,7 @@ public class HwPneumatics {
 
 	public HwPneumatics(){
 		c.setClosedLoopControl(true);
-		climberSolenoid.set(DoubleSolenoid.Value.kReverse);
+		climberSolenoid.set(DoubleSolenoid.Value.kForward);
 		intakeSolenoid.set(DoubleSolenoid.Value.kForward);
 		CPMSolenoid.set(DoubleSolenoid.Value.kForward);
 		extra.set(false);

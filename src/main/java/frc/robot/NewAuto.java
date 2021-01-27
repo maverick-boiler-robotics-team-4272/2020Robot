@@ -29,10 +29,10 @@ import edu.wpi.first.wpilibj.util.Units;
  */
 public class NewAuto {
 	Robot robot;
-	RamseteController ramsete = new RamseteController();
+	RamseteController ramsete = new RamseteController(1.6, 0.7);
 	DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(-Units.inchesToMeters(25.5));
 	public DifferentialDriveOdometry driveOdometry;
-	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(5), Units.feetToMeters(3));
+	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(2), Units.feetToMeters(3));
 	public double autoStartTime;
 	public Trajectory trajectory;
 	double RPM_TO_MPS = (9.0/84.0) * Units.inchesToMeters(6) * Math.PI;
@@ -49,29 +49,31 @@ public class NewAuto {
 	public NewAuto(Robot robot){
 		this.robot = robot;
 	}
+
 	public Trajectory trajectoryGeneration(){
 		String trajectoryJSON = "path\\Users\\Owner\\Documents\\2020\\PathWeaver\\Games";
 
 		try {
-		Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-		Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-		return robot.auto.trajectory;
+			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+			Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+			return robot.auto.trajectory;
 		} catch (IOException ex) {
-		DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-		return trajectory;
+			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+			return trajectory;
 		}
 		
 	}
+
 	public void generateTrajectory() {
-		DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 10);
+		DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 3);
 		DifferentialDriveVoltageConstraint voltConstraint = new DifferentialDriveVoltageConstraint(robot.motor.driveFeedForward, driveKinematics, 7);	
 		config.addConstraint(driveContraint);
 		config.addConstraint(voltConstraint);
 		config.setReversed(true);
 		var startWaypoint = new Pose2d(Units.feetToMeters(0), Units.feetToMeters(0), Rotation2d.fromDegrees(0));
-		var endWaypoint = new Pose2d(Units.feetToMeters(0), Units.feetToMeters(10), Rotation2d.fromDegrees(180));
+		var endWaypoint = new Pose2d(Units.feetToMeters(-12), Units.feetToMeters(3), Rotation2d.fromDegrees(270));
 		var interiorWaypoints = new ArrayList<Translation2d>();
-		interiorWaypoints.add(new Translation2d(Units.feetToMeters(-15), Units.feetToMeters(5)));
+		interiorWaypoints.add(new Translation2d(Units.feetToMeters(-5), Units.feetToMeters(0)));
 		// interiorWaypoints.add(new Translation2d(Units.feetToMeters(0.75), Units.feetToMeters(0)));
 		trajectory = TrajectoryGenerator.generateTrajectory(startWaypoint, interiorWaypoints, endWaypoint, config);
 	}
@@ -196,6 +198,7 @@ public class NewAuto {
 		robot.motor.leftEncoder.setPosition(0);
 		robot.motor.rightEncoder.setPosition(0);
 		driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
+		generateTrajectory();
 		autoStartTime = Timer.getFPGATimestamp();
 		state = 0;
 		robot.intake.toggle();
