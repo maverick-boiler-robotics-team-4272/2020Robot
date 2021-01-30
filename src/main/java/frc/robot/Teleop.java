@@ -198,14 +198,9 @@ public class Teleop {
 		}
 	}
 
-	// public void drive(double leftPower, double rightPower) {
-	// 	robot.motor.left1.set(leftPower);
-	// 	robot.motor.right1.set(rightPower);
-	// }
-
 	public void drive(double leftPower, double rightPower) {
-		robot.motor.setLeftVelocity(leftPower*2, 0);
-		robot.motor.setRightVelocity(rightPower*2, 0);
+		robot.motor.left1.set(leftPower);
+		robot.motor.right1.set(rightPower);
 	}
 
 	public void colorRotation(){

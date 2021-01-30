@@ -34,7 +34,7 @@ public class NewAuto {
 	public DifferentialDriveOdometry driveOdometry;
 	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(2), Units.feetToMeters(3));
 	public double autoStartTime;
-	public Trajectory trajectory;
+	public Trajectory trajectory = new Trajectory();
 	double RPM_TO_MPS = (9.0/84.0) * Units.inchesToMeters(6) * Math.PI;
 	DifferentialDriveWheelSpeeds prevSpeeds = new DifferentialDriveWheelSpeeds(0, 0);
 	double prevTime = 0;
@@ -50,19 +50,12 @@ public class NewAuto {
 		this.robot = robot;
 	}
 
-	public Trajectory trajectoryGeneration(){
-		String trajectoryJSON = "path\\Users\\Owner\\Documents\\2020\\PathWeaver\\Games";
-
-		try {
-			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-			Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-			return robot.auto.trajectory;
-		} catch (IOException ex) {
-			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-			return trajectory;
-		}
 		
-	}
+		
+
+	// public void pathweaverLoop(){
+	// 	hi
+	// }
 
 	public void generateTrajectory() {
 		DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(driveKinematics, 3);
@@ -198,7 +191,15 @@ public class NewAuto {
 		robot.motor.leftEncoder.setPosition(0);
 		robot.motor.rightEncoder.setPosition(0);
 		driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
-		generateTrajectory();
+		// generateTrajectory();
+		String trajectoryJSON = "paths/Path3.wpilib.json";
+		try {
+		  Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+		  trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+		} catch (IOException ex) {
+		  DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+		}
+		driveOdometry.resetPosition(trajectory.getInitialPose(),Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
 		autoStartTime = Timer.getFPGATimestamp();
 		state = 0;
 		robot.intake.toggle();

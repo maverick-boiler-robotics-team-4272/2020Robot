@@ -14,35 +14,56 @@ public class NetworkTables {
 
 	// standard robot network tables
 	NetworkTable table = inst.getTable("datatable");
+	//shooter PID
 	public NetworkTableEntry pre_kP = table.getEntry("shooter_kP");
 	public NetworkTableEntry pre_kF = table.getEntry("shooter_kF");
 	public NetworkTableEntry pre_kI = table.getEntry("shooter_kI");
 	public NetworkTableEntry pre_kD = table.getEntry("shooter_kD");
+
+	//intake PID
 	public NetworkTableEntry intake_pre_kP = table.getEntry("intake_kP");
 	public NetworkTableEntry intake_pre_kF = table.getEntry("intake_kF");
 	public NetworkTableEntry intake_pre_kI = table.getEntry("intake_kI");
 	public NetworkTableEntry intake_pre_kD = table.getEntry("intake_kD");
+
+	//shooter speed readout
 	public NetworkTableEntry shooterVel = table.getEntry("ShooterVelocity");
+
+	//intake speed readout
 	public NetworkTableEntry intakeVel = table.getEntry("IntakeVelocity");
+
+	//intake temp readout
 	public NetworkTableEntry intakeTemp = table.getEntry("IntakeTemp");
+
+	//current readout
 	public NetworkTableEntry shooterOutput = table.getEntry("ShooterOutput");
+
+	//other shooter things
 	public NetworkTableEntry shooterVelSetPoint = table.getEntry("ShooterVelocitySetPoint");
 	public NetworkTableEntry shooterVelHigh = table.getEntry("shooterVelSetpoint");
 	public NetworkTableEntry shooterVelLow = table.getEntry("shooterVelLow");
+
+	//left side drive PID
 	public NetworkTableEntry leftdrivePrekP = table.getEntry("leftdrivekP");
 	public NetworkTableEntry leftdrivePrekI = table.getEntry("leftdrivekI");
 	public NetworkTableEntry leftdrivePrekD = table.getEntry("leftdrivekD");
 	public NetworkTableEntry leftdrivePrekF = table.getEntry("leftdrivekF");
+
+	//right drive PID
 	public NetworkTableEntry rightdrivePrekP = table.getEntry("rightdrivekP");
 	public NetworkTableEntry rightdrivePrekI = table.getEntry("rightdrivekI");
 	public NetworkTableEntry rightdrivePrekD = table.getEntry("rightdrivekD");
 	public NetworkTableEntry rightdrivePrekF = table.getEntry("rightdrivekF");
+
+	//current drive velocity
 	public NetworkTableEntry rightDriveVel = table.getEntry("rightDriveVelocity");
 	public NetworkTableEntry rightDriveOutput = table.getEntry("rightDriveOutput");
 	public NetworkTableEntry rightDriveVelSetpoint = table.getEntry("rightSetpointReadout");
 	public NetworkTableEntry leftDriveVel = table.getEntry("leftDriveVelocity");
 	public NetworkTableEntry leftDriveOutput = table.getEntry("leftDriveOutput");
 	public NetworkTableEntry leftDriveVelSetpoint = table.getEntry("leftSetpointReadout");
+
+	//ball readouts
 	public NetworkTableEntry ball1 = table.getEntry("BallAStatus");
 	public NetworkTableEntry ball2 = table.getEntry("BallBStatus");
 	public NetworkTableEntry ball3 = table.getEntry("BallCStatus");
@@ -50,11 +71,11 @@ public class NetworkTables {
 	public NetworkTableEntry ball5 = table.getEntry("BallEStatus");
 
 	// limelight network tables
-	NetworkTable tableB = inst.getTable("limelight");
-	public NetworkTableEntry limelightLed = tableB.getEntry("ledMode");
-	public NetworkTableEntry limelightValidTarget = tableB.getEntry("tv");
-	public NetworkTableEntry limelightXDegrees = tableB.getEntry("tx");
-	public NetworkTableEntry limelightYDegrees = tableB.getEntry("ty");
+	NetworkTable limelightTable = inst.getTable("limelight");
+	public NetworkTableEntry limelightLed = limelightTable.getEntry("ledMode");
+	public NetworkTableEntry limelightValidTarget = limelightTable.getEntry("tv");
+	public NetworkTableEntry limelightXDegrees = limelightTable.getEntry("tx");
+	public NetworkTableEntry limelightYDegrees = limelightTable.getEntry("ty");
 
 	public NetworkTables(Robot robot) {
 		this.robot = robot;

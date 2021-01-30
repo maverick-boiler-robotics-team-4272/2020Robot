@@ -4,33 +4,20 @@ drive sticks:
 
   right joystick trigger pressed = shoot the balls in hopper
   right joystick trigger released = reverse balls
+  
   right axis = right drive velocity
 
   
 
 xbox controller:
 	left side:
-	
-		joystick up = increase target rpm for shooter wheel
-		joystick down  = decrease target rpm for shooter wheel
 
 		back button = disable shooter wheel
-		start button = start shooter wheel
-  
-		// left bumper = toggle led on or off
 
 		left trigger = intake stuff
 		
 
 	right side:
-	
-		y button = Manual CPM movement
-
-		a button = manual spin the CPM for position
-
-		right bumper = toggle limelight pipeline
-
-		x button pressed does intake/hopper cool stuff
 
 		right trigger with other buttons:
 			a pressed = intake pneumatics

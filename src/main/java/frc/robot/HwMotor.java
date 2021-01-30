@@ -55,6 +55,7 @@ public class HwMotor {
 	public final TalonSRX shooter2 = new TalonSRX(16);
 
 	public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
+	//taken from characterisation tool 1/27/2020
 	public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.221, 2.54, 0.513);
 	//Track width 62.405 units?
 
@@ -76,12 +77,14 @@ public class HwMotor {
 	private double intake_kI = 0;
 	private double intake_kD = 0;
 
-	private double leftDrivekP = 1.19;
+	//taken from characterisation tool 1/27/2020
+	private double leftDrivekP = 0.186;
 	private double leftDrivekI = 0;
 	private double leftDrivekD = 0;
 	private double leftDrivekF = 0;
 
-	private double rightDrivekP = 1.19;
+	//taken from characterisation tool 1/27/2020
+	private double rightDrivekP = 0.186;
 	private double rightDrivekI = 0;
 	private double rightDrivekD = 0;
 	private double rightDrivekF = 0;
