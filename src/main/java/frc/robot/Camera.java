@@ -70,66 +70,71 @@ public class Camera {
 		is_driver_vision = true;
 	}
 
-	public void updateLimelightTracking(){
-		double tolerance = 1.5;
+	public void updateLimelightTracking() {
+		double UpperTolerance = -0.75;
+		double BottomTolerance = -0.5;
 		double tx = robot.tables.limelightXDegrees.getDouble(0);
-		double error = Math.abs(tx) - tolerance;
-		double multiplier = (Math.round(error/6))<0?1:Math.round(error/6);
-		double motorSpeed = 0.2*multiplier;
+		double error = Math.min(Math.abs(tx) - UpperTolerance, Math.abs(tx) - BottomTolerance);
+		double multiplier = (Math.round(error / 6)) < 0 ? 1 : Math.round(error / 6);
+		double motorSpeed = 0.4;
+		double motorSpeedWMult = motorSpeed * multiplier;
+		double TargetFound = robot.tables.limelightValidTarget.getDouble(0);
 
-		if(tx > tolerance){
-			leftMotorSetpoint = -motorSpeed;
-			rightMotorSetpoint = motorSpeed;
-		} else if(tx < -tolerance){
-			leftMotorSetpoint = motorSpeed;
-			rightMotorSetpoint = -motorSpeed;
+		if (TargetFound != 1) {
+			leftMotorSetpoint = -1;
+			rightMotorSetpoint = 1;
+		} else {
+			if (tx > UpperTolerance) {
+				leftMotorSetpoint = -motorSpeedWMult;
+				rightMotorSetpoint = motorSpeedWMult;
+			} else if (tx < BottomTolerance) {
+				leftMotorSetpoint = motorSpeedWMult;
+				rightMotorSetpoint = -motorSpeedWMult;
+			}
 		}
 
 		robot.motor.setLeftVelocity(leftMotorSetpoint, 0);
 		robot.motor.setRightVelocity(rightMotorSetpoint, 0);
 
+		// final double DRIVE_K = -0.26; // the feed foreward for the robot drive
+		// final double DESIRED_TARGET_Y = 0; // the target y value given from limelight
+		// final double MAX_DRIVE = 0.2; // max speed the robot should drive
 
-	// 	final double DRIVE_K = -0.26; // the feed foreward for the robot drive
-	// 	final double DESIRED_TARGET_Y = 0; // the target y value given from limelight
-	// 	final double MAX_DRIVE = 0.2; // max speed the robot should drive
-		
+		// //getting current network table entries
 
+		// //found target (1 for found, 0 for not found)
+		// double tv = robot.tables.limelightValidTarget.getDouble(0);
 
-	// 	//getting current network table entries
+		// //x degrees from center of found target
+		// double tx = robot.tables.limelightXDegrees.getDouble(0);
 
-	// 	//found target (1 for found, 0 for not found)
-	// 	double tv = robot.tables.limelightValidTarget.getDouble(0);
+		// //y degrees from center of found target
+		// double ty = robot.tables.limelightYDegrees.getDouble(0);
+		// //end network table section
 
-	// 	//x degrees from center of found target
-	// 	double tx = robot.tables.limelightXDegrees.getDouble(0);
+		// //test if the limelight has found a target
+		// if(tv < 1.0){
+		// m_LimelightHasValidTarget = false; //does not have a target
+		// m_LimelightDriveCommand = 0; //dont go anywhere
+		// m_LimelightSteerCommand = 0; //dont go anywhere
+		// return; //stop executing the function
+		// }
 
-	// 	//y degrees from center of found target
-	// 	double ty = robot.tables.limelightYDegrees.getDouble(0);
-	// 	//end network table section
+		// m_LimelightHasValidTarget = true; //has a valid target
 
-
-	// 	//test if the limelight has found a target
-	// 	if(tv < 1.0){
-	// 		m_LimelightHasValidTarget = false; //does not have a target
-	// 		m_LimelightDriveCommand = 0; //dont go anywhere
-	// 		m_LimelightSteerCommand = 0; //dont go anywhere
-	// 		return; //stop executing the function
-	// 	}
-
-	// 	m_LimelightHasValidTarget = true; //has a valid target
-
-
-	// 	double steer_cmd = tx * STEER_K + accumulator * steerI; // how fast it should steer
-	// 	m_LimelightSteerCommand = steer_cmd; // puts the above into an other more different variable
-	// 	accumulator += tx;
-	// 	if(accumulator > accumulatorMax){
-	// 		accumulator = accumulatorMax;
-	// 	}else if(accumulator < accumulatorMin){
-	// 		accumulator = accumulatorMin;
-	// 	}
-	// 	leftMotorSetpoint = m_LimelightDriveCommand - m_LimelightSteerCommand;
-	// 	rightMotorSetpoint = m_LimelightDriveCommand + m_LimelightSteerCommand;
-	// 	robot.motor.setLeftVelocity(leftMotorSetpoint, 0);
-	// 	robot.motor.setRightVelocity(rightMotorSetpoint, 0);
+		// double steer_cmd = tx * STEER_K + accumulator * steerI; // how fast it should
+		// steer
+		// m_LimelightSteerCommand = steer_cmd; // puts the above into an other more
+		// different variable
+		// accumulator += tx;
+		// if(accumulator > accumulatorMax){
+		// accumulator = accumulatorMax;
+		// }else if(accumulator < accumulatorMin){
+		// accumulator = accumulatorMin;
+		// }
+		// leftMotorSetpoint = m_LimelightDriveCommand - m_LimelightSteerCommand;
+		// rightMotorSetpoint = m_LimelightDriveCommand + m_LimelightSteerCommand;
+		// robot.motor.setLeftVelocity(leftMotorSetpoint, 0);
+		// robot.motor.setRightVelocity(rightMotorSetpoint, 0);
 	}
 }

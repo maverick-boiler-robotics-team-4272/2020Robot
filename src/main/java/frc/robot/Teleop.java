@@ -98,6 +98,7 @@ public class Teleop {
 
 		if(robot.jstick.rightJoystick.getTopPressed()){
 			rpm = rpmLow;
+
 			robot.hopper.shoot_balls();
 			robot.shooter.startShooter();
 		}else if(robot.jstick.rightJoystick.getTopReleased()){
@@ -116,6 +117,22 @@ public class Teleop {
 		}
 
 		this.sendIt = robot.jstick.leftJoystick.getTop();
+
+
+		//to allow control from the joystick
+		if(robot.jstick.rightJoystick.getRawButtonPressed(4)) {
+			robot.hopper.intake_balls();
+			if(robot.hopper.countBalls() < 5){
+				robot.intake.on(1);
+			}
+		} else if(robot.jstick.rightJoystick.getRawButtonReleased(4)){
+			robot.hopper.stop_intaking();
+			robot.intake.off();
+		}
+		if(robot.jstick.rightJoystick.getRawButtonReleased(3)){
+			robot.intake.toggle();
+		}
+		
 
 		if((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15)) {
 			robot.hopper.intake_balls();
