@@ -54,4 +54,11 @@ public class Shooter {
 		robot.motor.shooter1.set(ControlMode.PercentOutput, 0);
 	}
 
+	public double limeLightDegreesToDistance(double LMAngle){
+		double angleToTarget = 19.84 + LMAngle;
+		double radianToTarget = Math.toRadians(angleToTarget);
+		double distanceToTarget = (54.25/(Math.tan(radianToTarget)));
+		return distanceToTarget;
+	}
+
 }

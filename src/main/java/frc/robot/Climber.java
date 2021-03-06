@@ -5,7 +5,8 @@ import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 public class Climber{
 	Robot robot; //allows communication to different classes
 
-	private boolean extended = false;
+	// private boolean extended = false;
+	private boolean extended = true;
 
 	//instanciates class
 	public Climber(Robot robot){

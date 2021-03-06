@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
 		tables = new NetworkTables(this);
 		teleop = new Teleop(this);
 		auto = new NewAuto(this);
+		// auto = new NewAutoc(this);
 		motor = new HwMotor(this);
 		jstick = new HwJoystick();
 		camera = new Camera(this);
@@ -95,7 +96,8 @@ public class Robot extends TimedRobot {
 				break;
 		}*/
 		allbot.loopAll();
-		auto.loop();
+		auto.bouncePath();
+		// auto.loop();
 	}
 
 	/**

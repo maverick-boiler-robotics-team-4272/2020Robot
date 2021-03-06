@@ -77,6 +77,15 @@ public class NetworkTables {
 	public NetworkTableEntry limelightXDegrees = limelightTable.getEntry("tx");
 	public NetworkTableEntry limelightYDegrees = limelightTable.getEntry("ty");
 
+	//path tables
+	public NetworkTableEntry drivePosX = table.getEntry("posX");
+	public NetworkTableEntry drivePosY = table.getEntry("posY");
+	public NetworkTableEntry drivePosAngle = table.getEntry("posAngle");
+	public NetworkTableEntry driveGoalPosX = table.getEntry("posGoalX");
+	public NetworkTableEntry driveGoalPosY = table.getEntry("posGoalY");
+	public NetworkTableEntry driveGoalPosAngle = table.getEntry("posGoalAngle");
+	public NetworkTableEntry drivePathPos = table.getEntry("posPathNumber");
+
 	public NetworkTables(Robot robot) {
 		this.robot = robot;
 	}

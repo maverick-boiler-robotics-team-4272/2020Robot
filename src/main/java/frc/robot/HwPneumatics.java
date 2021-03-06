@@ -19,10 +19,11 @@ public class HwPneumatics {
 
 	public HwPneumatics(){
 		c.setClosedLoopControl(true);
-		climberSolenoid.set(DoubleSolenoid.Value.kForward);
-		intakeSolenoid.set(DoubleSolenoid.Value.kForward);
-		CPMSolenoid.set(DoubleSolenoid.Value.kForward);
-		extra.set(false);
+		// climberSolenoid.set(DoubleSolenoid.Value.kForward);
+		// climberSolenoid.set(DoubleSolenoid.Value.kReverse);
+		// intakeSolenoid.set(DoubleSolenoid.Value.kForward);
+		// CPMSolenoid.set(DoubleSolenoid.Value.kForward);
+		// extra.set(false);
 	}
 	
 	public void compressor(){
