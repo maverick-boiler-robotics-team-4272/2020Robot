@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class Hopper {
     // public DigitalInput intake_sense = new DigitalInput(0);
+    // the beam break sensors for the hopper line
     public DigitalInput intake_to_hopper_sense = new DigitalInput(10);
     public DigitalInput hopper_ball_a_sense = new DigitalInput(11);
     public DigitalInput hopper_ball_b_sense = new DigitalInput(12);
@@ -15,7 +16,7 @@ public class Hopper {
     public DigitalInput shooter_ball_sense = new DigitalInput(14);
 
 
-
+    //the current values for the position of the ball (true means there is a ball present in that position)
     public boolean intake_to_hopper_sensor = false;
     public boolean prev_intake_to_hopper_sensor = false;
     public boolean hopper_ball_a = false; // closer to intake
@@ -23,6 +24,7 @@ public class Hopper {
     public boolean hopper_ball_c = false; // closer to shooter
     public boolean shooter_ball = false;
 
+    //just so we can keep track of what is going on
     public boolean is_shooting = false;
     public boolean is_intaking = false;
     public boolean is_stopping = false;
@@ -39,9 +41,9 @@ public class Hopper {
     CANSparkMax hopper_infeed;
     CANSparkMax hopper;
     CANSparkMax shooter_infeed;
-    double belt_speed = -0.4;
-    double shooter_feeder_wheel = -0.4;
-    boolean intakeSwitch = true;
+    final double belt_speed = -0.4;
+    final double shooter_feeder_wheel = -0.4;
+    final boolean intakeSwitch = true;
     public boolean needCorrections = false;
 
     private double current_intake_time = 0;
@@ -81,11 +83,11 @@ public class Hopper {
 
     public void update_tables(){
         robot.hopper.readArduino(); // update sensor values
-        robot.motor.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);
-        robot.motor.ball2.setBoolean(robot.hopper.hopper_ball_a);
-        robot.motor.ball3.setBoolean(robot.hopper.hopper_ball_b);
-        robot.motor.ball4.setBoolean(robot.hopper.hopper_ball_c);
-        robot.motor.ball5.setBoolean(robot.hopper.shooter_ball);
+        robot.tables.ball1.setBoolean(robot.hopper.intake_to_hopper_sensor);
+        robot.tables.ball2.setBoolean(robot.hopper.hopper_ball_a);
+        robot.tables.ball3.setBoolean(robot.hopper.hopper_ball_b);
+        robot.tables.ball4.setBoolean(robot.hopper.hopper_ball_c);
+        robot.tables.ball5.setBoolean(robot.hopper.shooter_ball);
     }
 
     public int countBalls(){

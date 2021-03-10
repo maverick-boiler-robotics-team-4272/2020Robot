@@ -19,6 +19,7 @@ public class HwPneumatics {
 
 	public HwPneumatics(){
 		c.setClosedLoopControl(true);
+		//initially sets the values to the pneumatcs
 		// climberSolenoid.set(DoubleSolenoid.Value.kForward);
 		// climberSolenoid.set(DoubleSolenoid.Value.kReverse);
 		// intakeSolenoid.set(DoubleSolenoid.Value.kForward);

@@ -59,13 +59,6 @@ public class HwMotor {
 	public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.221, 2.54, 0.513);
 	//Track width 62.405 units?
 
-	NetworkTableInstance inst = NetworkTableInstance.getDefault();
-	NetworkTable table = inst.getTable("datatable");
-	public NetworkTableEntry ball1 = table.getEntry("BallAStatus");
-	public NetworkTableEntry ball2 = table.getEntry("BallBStatus");
-	public NetworkTableEntry ball3 = table.getEntry("BallCStatus");
-	public NetworkTableEntry ball4 = table.getEntry("BallDStatus");
-	public NetworkTableEntry ball5 = table.getEntry("BallEStatus");
 
 	private double shooter_kP = 0.3;
     private double shooter_kI = 0.0;

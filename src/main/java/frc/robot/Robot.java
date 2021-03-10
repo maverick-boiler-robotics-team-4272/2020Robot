@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
+	//sets everything here so anything can be accessed from anywhere
 	public Teleop teleop;
 	public HwJoystick jstick;
 	public Camera camera;
@@ -22,6 +23,7 @@ public class Robot extends TimedRobot {
 	// public ColorThing color;
 	public Hopper hopper;
 	public NewAuto auto;
+	// public NewAutoc auto;
 	public NetworkTables tables;
 	public AllBot allbot;
 	/**
@@ -30,6 +32,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		// passes robot to everything so anything can access anything
 		tables = new NetworkTables(this);
 		teleop = new Teleop(this);
 		auto = new NewAuto(this);

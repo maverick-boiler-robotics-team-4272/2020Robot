@@ -55,6 +55,6 @@ public class Intake{
 	// turns on the motors for the intake
 	public void on(double speed){
 		robot.motor.intake.set(speed);
-		robot.motor.intake2.set(-speed);
+		robot.motor.intake2.set(speed);
 	}
 }

@@ -279,12 +279,12 @@ public class NetworkTables {
 	}
 
 	public void logNetworkTables() {
-		robot.tables.intakeVel.setNumber(robot.motor.intakeEncoder.getVelocity());
-		robot.tables.intakeTemp.setNumber(robot.motor.intake.getMotorTemperature());
-		robot.tables.rightDriveVel.setNumber(robot.motor.rightEncoder.getVelocity());
-		robot.tables.rightDriveOutput.setNumber(robot.motor.right1.getAppliedOutput());
-		robot.tables.leftDriveVel.setNumber(robot.motor.leftEncoder.getVelocity());
-		robot.tables.leftDriveOutput.setNumber(robot.motor.left1.getAppliedOutput());
+		intakeVel.setNumber(robot.motor.intakeEncoder.getVelocity());
+		intakeTemp.setNumber(robot.motor.intake.getMotorTemperature());
+		rightDriveVel.setNumber(robot.motor.rightEncoder.getVelocity());
+		rightDriveOutput.setNumber(robot.motor.right1.getAppliedOutput());
+		leftDriveVel.setNumber(robot.motor.leftEncoder.getVelocity());
+		leftDriveOutput.setNumber(robot.motor.left1.getAppliedOutput());
 	}
 
 	public void loop() {

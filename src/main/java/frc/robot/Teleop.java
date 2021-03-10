@@ -41,9 +41,11 @@ public class Teleop {
 	// public static boolean reversing = false;
 
 	public void run() {
+		//our two joysticks
 		double leftSpeed = robot.jstick.leftJoystick.getY();
 		double rightSpeed = robot.jstick.rightJoystick.getY();
 
+		//make sure that it does not randomly move on its own we have a deadzone
 		if (Math.abs(leftSpeed) < deadzone) {
 			leftSpeed = 0;
 		} else {
@@ -69,6 +71,7 @@ public class Teleop {
 		}
 
 
+		// use so we can still get low speeds, and have control of higher speeds as well
 		if (leftSpeed > 0) {
 			leftSpeed *= leftSpeed;
 		}else{
@@ -80,14 +83,9 @@ public class Teleop {
 		}else{
 			rightSpeed *= -1 * rightSpeed;
 		}
-        
-        // robot.camera.loop();
-        // if(robot.camera.is_aligning) {
-        //     leftSpeed = robot.camera.m_LimelightDriveCommand - robot.camera.m_LimelightSteerCommand;
-		// 	rightSpeed = robot.camera.m_LimelightDriveCommand + robot.camera.m_LimelightSteerCommand;
-        // }
 		
 		
+		//on our left joystick the front trigger button, that activates our auto aligning code for the limelight
 		if (robot.jstick.leftJoystick.getTrigger()) {
 			robot.camera.autoAlign();
 		}else if(robot.jstick.leftJoystick.getTriggerReleased()){
@@ -96,6 +94,7 @@ public class Teleop {
 			drive(leftSpeed, rightSpeed);
 		}
 
+		//the slow version of the shooter
 		if(robot.jstick.rightJoystick.getTopPressed()){
 			rpm = rpmLow;
 
@@ -107,6 +106,7 @@ public class Teleop {
 		}
 
 
+		//the fast version of the shooter
 		if (robot.jstick.rightJoystick.getTriggerPressed()) {
 			rpm = rpmHigh;
             robot.hopper.shoot_balls();
@@ -119,7 +119,7 @@ public class Teleop {
 		this.sendIt = robot.jstick.leftJoystick.getTop();
 
 
-		//to allow control from the joystick
+		//to allow control from the joystick (not working right now)
 		if(robot.jstick.rightJoystick.getRawButtonPressed(4)) {
 			robot.hopper.intake_balls();
 			if(robot.hopper.countBalls() < 5){
@@ -134,10 +134,12 @@ public class Teleop {
 		}
 		
 
+		//the code to allow variable speed the intake
 		if((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) > 0.15)) {
 			robot.hopper.intake_balls();
 			if(robot.hopper.countBalls() < 5){
 				if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15) {
+					//reverses the intake is the left trigger is pressed in tandom with the right one
 					robot.intake.on(((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15) * 0.75);
 				}else {
 					robot.intake.on((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) - 0.15) * 0.75);
@@ -151,10 +153,12 @@ public class Teleop {
 		}
 
 
+		// runs the compressor with the start button
 		if(robot.jstick.xbox.getStartButton()) {
 			robot.pneumatics.compressor();
 		}
 
+		// reverses the hopper in the event that a ball gets stuck
 		if(robot.jstick.xbox.getBackButton()) {
 			robot.hopper.reverse_hopper();
 			robot.intake.on(-0.5);
@@ -164,6 +168,7 @@ public class Teleop {
 			robot.intake.off();
 		}
 		
+		//the right trigger is acting as a button for us
 		if (robot.jstick.xbox.getTriggerAxis(Hand.kRight) > 0.2) {
 			
 			if(robot.jstick.xbox.getAButtonPressed()) {
@@ -191,6 +196,7 @@ public class Teleop {
 			colorRotation();
 		}
 
+		// individually control the the climber hooks t allow for leveling
 		if(Math.abs(robot.jstick.xbox.getY(Hand.kRight)) > 0.2){
 			robot.motor.climberRight.set(robot.jstick.xbox.getY(Hand.kRight) * -1);
 			System.out.println(robot.motor.climberRight.getEncoder().getPosition());
@@ -204,6 +210,7 @@ public class Teleop {
 			robot.motor.climberLeft.set(0);
 		}
 
+		//allow for manual release of the soft limit due to it being set at the very beginning
 		if(robot.jstick.leftJoystick.getRawButtonPressed(16)) {
 			robot.motor.climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, false);
 			robot.motor.climberRight.enableSoftLimit(SoftLimitDirection.kReverse, false);

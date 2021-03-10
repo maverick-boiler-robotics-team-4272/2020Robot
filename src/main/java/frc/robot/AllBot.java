@@ -6,6 +6,9 @@ public class AllBot{
 		this.robot = robot;
 	}
 
+	/**
+	 * loop all of the classes that we use
+	 */
 	public void loopAll(){
 		robot.tables.loop();
 		robot.camera.loop();
@@ -16,6 +19,9 @@ public class AllBot{
 		robot.hopper.loop();
 	}
 
+	/**
+	 * reset all of the classes that we use
+	 */
 	public void resetAll(){
 		robot.tables.reset();
 		robot.camera.reset();

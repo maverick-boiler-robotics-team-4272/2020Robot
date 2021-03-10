@@ -6,4 +6,7 @@ public class Hood {
     public Hood(Robot robot){
         this.robot = robot;
     }
+    public void goToAngle(double angle){
+        //adjust shooter angle
+    }
 }

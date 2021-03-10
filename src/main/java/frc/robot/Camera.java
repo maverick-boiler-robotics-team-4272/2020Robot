@@ -2,8 +2,6 @@ package frc.robot;
 
 import java.math.RoundingMode;
 
-import edu.wpi.first.networktables.*;
-
 /**
  * Add your docs here.
  */
@@ -70,6 +68,7 @@ public class Camera {
 		is_driver_vision = true;
 	}
 
+	//aims the robot based on the angle from the limelight
 	public boolean updateLimelightTracking() {
 		double UpperTolerance = -0.75;
 		double BottomTolerance = -0.5;
