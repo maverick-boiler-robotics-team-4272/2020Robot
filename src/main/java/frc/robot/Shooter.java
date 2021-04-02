@@ -57,12 +57,6 @@ public class Shooter {
 		robot.motor.shooter1.set(ControlMode.PercentOutput, 0);
 	}
 
-	//the function to get the angle from our limelight and convert it to a distance (in [unit to put in later])
-	public double limeLightDegreesToDistance(double LMAngle){
-		double angleToTarget = 19.84 + LMAngle;
-		double radianToTarget = Math.toRadians(angleToTarget);
-		double distanceToTarget = (54.25/(Math.tan(radianToTarget)));
-		return distanceToTarget;
-	}
+	
 
 }

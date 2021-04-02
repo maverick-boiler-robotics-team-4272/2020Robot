@@ -31,6 +31,8 @@ public class Teleop {
 	double cpmEncoderEnd = 150;
 	boolean colorRotation = false;
 
+	double hoodAngle = 0;
+
 	public boolean sendIt;
 
 	// boolean wasZeroRight = true;
@@ -220,7 +222,36 @@ public class Teleop {
 			robot.motor.climberRight.enableSoftLimit(SoftLimitDirection.kReverse, true);
 			System.out.println("re-enabled climber limits");
 		}
+
+		if(robot.jstick.leftJoystick.getRawAxis(3)>0.1){
+			robot.motor.shooterHood.set((robot.jstick.leftJoystick.getRawAxis(3)*robot.jstick.leftJoystick.getRawAxis(3))/25
+			);
+			System.out.println("ShooterHood position: " + robot.motor.shooterHood.getEncoder().getPosition() * 6);
+		} else if(robot.jstick.rightJoystick.getRawAxis(3)>0.1){
+			robot.motor.shooterHood.set(((robot.jstick.rightJoystick.getRawAxis(3)*robot.jstick.rightJoystick.getRawAxis(3))/25)*-1);
+			System.out.println("ShooterHood position: " + robot.motor.shooterHood.getEncoder().getPosition() * 6);
+
+		} else if(robot.jstick.leftJoystick.getRawButtonPressed(3)){
+			robot.motor.shooterHood.set(0);
+		}
+
+		robot.tables.shooterDistance.setDouble(robot.hood.limeLightDegreesToDistance(robot.tables.limelightYDegrees.getDouble(0)));
+		// robot.tables.shooterDistance.setDouble(1.0);
+
+		//Setting Hood Angle with math
+		if(robot.jstick.leftJoystick.getRawButtonPressed(2)){
+			robot.hood.getHoodAngle();
+			hoodAngle = robot.hood.getHoodAngle();
+		}
+		if(robot.jstick.leftJoystick.getRawButton(2)){
+			robot.hood.goToAngle(hoodAngle);
+		}else if(robot.jstick.leftJoystick.getRawButtonReleased(2)){
+			robot.motor.shooterHood.set(0);
+			hoodAngle = 0;
+		}
 	}
+
+
 
 	public void drive(double leftPower, double rightPower) {
 		robot.motor.left1.set(leftPower);

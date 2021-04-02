@@ -39,8 +39,9 @@ public class NewAuto {
 	// RamseteController ramsete = new RamseteController(1.6, 0.7);
 	RamseteController ramsete = new RamseteController();
 	DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(-Units.inchesToMeters(25.5));
-	public DifferentialDriveOdometry driveOdometry;
-	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(4.5), Units.feetToMeters(3));
+	// public DifferentialDriveOdometry driveOdometry;
+	TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(14), Units.feetToMeters(10));
+	// TrajectoryConfig config = new TrajectoryConfig(Units.feetToMeters(4), Units.feetToMeters(2));
 	public double autoStartTime = 0;
 	public Trajectory trajectory = null;
 	double RPM_TO_MPS = (9.0 / 84.0) * Units.inchesToMeters(6) * Math.PI;
@@ -49,38 +50,25 @@ public class NewAuto {
 	double curTime = 0;
 	int state = 0;
 	int bouncePathState;
+	int slalomPathState;
+	int barrelPathState;
 	double timeStampLoop2 = 0;
 	double shootCountdown = 0;
 	double alignTime = 0;
 	double intakeTime = 0;
 	Pose2d GoalParams;
-	double GoalXTolerance = 0.2;
-	double GoalYTolerance = 0.2;
-	double GoalAngleTolerance = 90;
+	// double GoalXTolerance = 0.2;
+	// double GoalYTolerance = 0.2;
+	// double GoalAngleTolerance = 90;
+	double GoalXTolerance = 0.4;
+	double GoalYTolerance = 0.4;
+	double GoalAngleTolerance = 20;
 	double bouncePathStart = 0;
 	boolean pathsDone = false;
 
 	public NewAuto(Robot robot) {
 		this.robot = robot;
 	}
-
-	// public void pathweaverLoop(){
-	// hi
-	// }
-
-	/*
-	 * public void generateTrajectory() { configConstraints(); var startWaypoint =
-	 * new Pose2d(0, 0, Rotation2d.fromDegrees(0)); var endWaypoint = new
-	 * Pose2d(Units.feetToMeters(22), 0.0, Rotation2d.fromDegrees(0)); var
-	 * interiorWaypoints = List.of( new Translation2d(Units.feetToMeters(5),
-	 * Units.feetToMeters(5)), new Translation2d(Units.feetToMeters(10),
-	 * Units.feetToMeters(-5)), new Translation2d(Units.feetToMeters(12.5),
-	 * Units.feetToMeters(5)), new Translation2d(Units.feetToMeters(16),
-	 * Units.feetToMeters(-5)), new Translation2d(Units.feetToMeters(18),
-	 * Units.feetToMeters(5)) ); trajectory =
-	 * TrajectoryGenerator.generateTrajectory(startWaypoint, interiorWaypoints,
-	 * endWaypoint, config); }
-	 */
 
 	// Copy of the generateTrajectory function, but using parameters to allow for
 	// easier looping for bouncepath
@@ -158,15 +146,19 @@ public class NewAuto {
 	 * used to have the params for limits with the ramsette auto
 	 */
 	public void configConstraints() {
+		// DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(
+		// 		driveKinematics, 4);
+
 		DifferentialDriveKinematicsConstraint driveContraint = new DifferentialDriveKinematicsConstraint(
-				driveKinematics, 4);
+				driveKinematics, 10);
+
 		//commented this out because of the error of the min acceleration being greater than its max acceleration and this fixed it
 		// DifferentialDriveVoltageConstraint voltConstraint = new
 		// DifferentialDriveVoltageConstraint(
 		// robot.motor.driveFeedForward, driveKinematics, 10);
 
 		//set its max turning acceleration so it does not freak out and overshoot as much
-		CentripetalAccelerationConstraint maxTurnAcceleration = new CentripetalAccelerationConstraint(0.5);
+		CentripetalAccelerationConstraint maxTurnAcceleration = new CentripetalAccelerationConstraint(2);
 		config.addConstraint(driveContraint);
 		// config.addConstraint(voltConstraint);
 		config.addConstraint(maxTurnAcceleration);
@@ -178,42 +170,33 @@ public class NewAuto {
 	public void loop() {
 		double time = Timer.getFPGATimestamp() - autoStartTime;
 
-		double rightPosition = robot.motor.rightEncoder.getPosition();
-		double leftPosition = robot.motor.leftEncoder.getPosition();
-		driveOdometry.update(Rotation2d.fromDegrees(robot.motor.ahrs.getFusedHeading() * -1), leftPosition,
-				rightPosition);
-
 		Trajectory.State goal = trajectory.sample(time);
-		ChassisSpeeds speeds = ramsete.calculate(driveOdometry.getPoseMeters(), goal);
+		ChassisSpeeds speeds = ramsete.calculate(robot.odometry.driveOdometry.getPoseMeters(), goal);
 		DifferentialDriveWheelSpeeds wheelSpeeds = driveKinematics.toWheelSpeeds(speeds);
 		double dt = time - prevTime;
 		double leftVelocity = wheelSpeeds.leftMetersPerSecond;
 		double rightVelocity = wheelSpeeds.rightMetersPerSecond;
 		double rightAcceleration = (rightVelocity - prevSpeeds.rightMetersPerSecond) / dt;
-		double leftAcceleration = (leftVelocity - prevSpeeds.rightMetersPerSecond) / dt;
+		// double leftAcceleration = (leftVelocity - prevSpeeds.rightMetersPerSecond) / dt;
+		double leftAcceleration = (leftVelocity - prevSpeeds.leftMetersPerSecond) / dt;
 		robot.motor.setRightVelocity(rightVelocity, rightAcceleration);
 		robot.motor.setLeftVelocity(leftVelocity, leftAcceleration);
 
 		prevTime = time;
 		prevSpeeds = wheelSpeeds;
-		// System.out.println("goal: " + goal.poseMeters);
-		// System.out.println("real: " + driveOdometry.getPoseMeters());
-		// if(driveOdometry.getPoseMeters() == goal.poseMeters){
-		// robot.pneumatics.CPMSolenoid.set(Value.kForward);
-		// }
 	}
 
 	/** 
 	 * function to generate the new trajectories based on the global variable, bouncePathState
 	 */
-	private void newPath() {
+	private void newBouncePath() {
 		//from the front bumper to the navX in inches divided by 12 to get feet
-		double frontToNavX = (18/12);
+		double frontToNavX = (22/12);
 		// last point is the position so the navX hits the point
-		double[][] pointsa = { { 0, 0, 0 }, { 5, 0 }, { 7.5 - frontToNavX, 5, 90 } };
-		double[][] pointsb = { pointsa[(pointsa.length - 1)], { 7.5 - frontToNavX, 0 }, { 10.75 - frontToNavX, -5}, { 15 - frontToNavX, -5}, { 15 - frontToNavX, 5, -90} };
-		double[][] pointsc = { pointsb[(pointsb.length - 1)], { 15 - frontToNavX, -5 }, { 22 - frontToNavX, -5 }, { 22.5 - frontToNavX, 5, 90} };
-		double[][] pointsd = { pointsc[(pointsc.length - 1)], { 22.5 - frontToNavX, -0.5 }, { 27.5 - frontToNavX, -1, -180 } };
+		double[][] pointsa = { { 0, 0, 0 }, { 5, 0 }, { 7 - frontToNavX, 5, 90 } };
+		double[][] pointsb = { pointsa[(pointsa.length - 1)], { 9 - frontToNavX, 0 }, { 10.75 - frontToNavX, -5}, { 14 - frontToNavX, -5}, { 14- frontToNavX, 5, -90} };
+		double[][] pointsc = { pointsb[(pointsb.length - 1)], { 15 - frontToNavX, -4 }, { 21 - frontToNavX, -4 }, { 22.75 - frontToNavX, 5, 90} };
+		double[][] pointsd = { pointsc[(pointsc.length - 1)], { 22.5 - frontToNavX, 0.5 }, { 27.5 - frontToNavX, 0, -180 } };
 		//create a new path from the above parameters (all measurements in feet and angles)
 		switch (bouncePathState) {
 			case 0:
@@ -242,13 +225,13 @@ public class NewAuto {
 	/**
 	 * done to prevent the creating of a path every loop and save the CPU cycles
 	 */
-	private void incrementPath() {
+	private void incrementBouncePath() {
 		if(!pathsDone){
 			System.out.println("bouncePathState pre ++: " + bouncePathState);
 			bouncePathState++;
 			robot.motor.setRightVelocity(0, 0);
 			robot.motor.setLeftVelocity(0, 0);
-			newPath();
+			newBouncePath();
 			// robot.intake.toggle();
 			System.out.println("bouncePathState post ++: " + bouncePathState);
 		}
@@ -258,40 +241,230 @@ public class NewAuto {
 	public void bouncePath() {
 		if (trajectory == null) {
 			bouncePathState = 0;
-			newPath();
-			driveOdometry.resetPosition(trajectory.getInitialPose(),
-					Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
+			newBouncePath();
+			robot.odometry.resetObometry();
 		}
 
 		// Test whether the robot is within the tolerance of the end point
-		boolean outXTolerance = (((driveOdometry.getPoseMeters().getX()) > GoalParams.getX() + GoalXTolerance)
-				|| ((driveOdometry.getPoseMeters().getX()) < GoalParams.getX() - GoalXTolerance));
-		boolean outYTolerance = (((driveOdometry.getPoseMeters().getY()) > GoalParams.getY() + GoalYTolerance)
-				|| ((driveOdometry.getPoseMeters().getY()) < GoalParams.getY() - GoalYTolerance));
-		boolean outAngleTolerance = (((driveOdometry.getPoseMeters().getRotation().getDegrees()) > GoalParams
+		boolean outXTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getX()) > GoalParams.getX() + GoalXTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getX()) < GoalParams.getX() - GoalXTolerance));
+		boolean outYTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getY()) > GoalParams.getY() + GoalYTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getY()) < GoalParams.getY() - GoalYTolerance));
+		boolean outAngleTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getRotation().getDegrees()) > GoalParams
 				.getRotation().getDegrees() + GoalAngleTolerance)
-				|| ((driveOdometry.getPoseMeters().getRotation().getDegrees()) < GoalParams.getRotation().getDegrees()
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getRotation().getDegrees()) < GoalParams.getRotation().getDegrees()
 						- GoalAngleTolerance));
 
 		// if within tolerance increment path number the loop otherwise do drive loop
 		if ((!outXTolerance && !outYTolerance && !outAngleTolerance)) {
-			incrementPath();
+			incrementBouncePath();
 		} else {
 			loop();
 		}
-		//put its current drive parameters onto the network tables
-		robot.tables.drivePosX.setDouble(driveOdometry.getPoseMeters().getX());
-		robot.tables.drivePosY.setDouble(driveOdometry.getPoseMeters().getY());
-		robot.tables.drivePosAngle.setDouble(driveOdometry.getPoseMeters().getRotation().getDegrees());
+	}
+
+	private void newSlalomPath() {
+		//from the front bumper to the navX in inches divided by 12 to get feet
+		double frontToNavX = (18/12);
+		// last point is the position so the navX hits the point
+		double topY = 5;
+		double bottomY = 0.5;
+		double middleY = 2.5;
+		double[][] pointsa = { { 0, 0, 0 }, { 4 - frontToNavX, 0}, { 7 - frontToNavX, middleY, 60},
+		{ 10.5 - frontToNavX, topY }, {19.5 - frontToNavX, topY}, {21.75 - frontToNavX, middleY, -45},
+		{ 24 - frontToNavX, bottomY }, {26.5 - frontToNavX, bottomY}, { 27.5 - frontToNavX, middleY ,90 },
+		{ 26.5 - frontToNavX, topY }, { 24 - frontToNavX, topY }, { 22.5 - frontToNavX, middleY, -135 },
+		{ 20 - frontToNavX, bottomY }, { 9.5 - frontToNavX, bottomY }, { 7.5 - frontToNavX, middleY, 135 },
+		{ 6.5 - frontToNavX, topY }, { 0, topY , 180} };
+		//create a new path from the above parameters (all measurements in feet and angles)
+		switch (slalomPathState) {
+			case 0:
+				generateTrajectoryWithParameters(false, pointsa);
+				break;
+			default:
+				//tells the code it is done so it does not increment the path to infinity (and save resources in doing so)
+				pathsDone = true;
+		}
+		//put all of the goal parameters onto the network tables
+		robot.tables.driveGoalPosX.setDouble(GoalParams.getX());
+		robot.tables.driveGoalPosY.setDouble(GoalParams.getY());
+		robot.tables.driveGoalPosAngle.setDouble(GoalParams.getRotation().getDegrees());
+		robot.tables.drivePathPos.setNumber(slalomPathState);
+	}
+
+	// private void newSlalomPath() {
+	// 	//from the front bumper to the navX in inches divided by 12 to get feet
+	// 	double frontToNavX = (18/12);
+	// 	// last point is the position so the navX hits the point
+	// 	double topY = 5;
+	// 	double bottomY = 0.5;
+	// 	double middleY = 2.5;
+	// 	double[][] pointsa = { { 0, 0, 0 }, { 4 - frontToNavX, 0}, { 7 - frontToNavX, middleY, 60}};
+	// 	double[][] pointsb = { pointsa[(pointsa.length - 1)], { 10.5 - frontToNavX, topY }, {19.5 - frontToNavX, topY}, {21.75 - frontToNavX, middleY, -45}};
+	// 	double[][] pointsc = { pointsb[(pointsb.length - 1)], { 25 - frontToNavX, bottomY }, {26.5 - frontToNavX, bottomY}, { 27.5 - frontToNavX, middleY ,90 }};
+	// 	double[][] pointsd = { pointsc[(pointsc.length - 1)], { 26.5 - frontToNavX, topY }, { 24 - frontToNavX, topY }, { 23 - frontToNavX, middleY, -135 } };
+	// 	double[][] pointse = { pointsd[(pointsd.length - 1)], { 20 - frontToNavX, bottomY }, { 9.5 - frontToNavX, bottomY }, { 7.5 - frontToNavX, middleY, 135 } };
+	// 	double[][] pointsf = { pointse[(pointse.length - 1)], { 6.5 - frontToNavX, topY }, { 0, topY , 180} };
+	// 	//create a new path from the above parameters (all measurements in feet and angles)
+	// 	switch (slalomPathState) {
+	// 		case 0:
+	// 			generateTrajectoryWithParameters(false, pointsa);
+	// 			break;
+	// 		case 1:
+	// 			generateTrajectoryWithParameters(false, pointsb);
+	// 			break;
+	// 		case 2:
+	// 			generateTrajectoryWithParameters(false, pointsc);
+	// 			break;
+	// 		case 3:
+	// 			generateTrajectoryWithParameters(false, pointsd);
+	// 			break;
+	// 		case 4:
+	// 			generateTrajectoryWithParameters(false, pointse);
+	// 			break;
+	// 		case 5:
+	// 			generateTrajectoryWithParameters(false, pointsf);
+	// 			break;
+	// 		default:
+	// 			//tells the code it is done so it does not increment the path to infinity (and save resources in doing so)
+	// 			pathsDone = true;
+	// 	}
+	// 	//put all of the goal parameters onto the network tables
+	// 	robot.tables.driveGoalPosX.setDouble(GoalParams.getX());
+	// 	robot.tables.driveGoalPosY.setDouble(GoalParams.getY());
+	// 	robot.tables.driveGoalPosAngle.setDouble(GoalParams.getRotation().getDegrees());
+	// 	robot.tables.drivePathPos.setNumber(slalomPathState);
+	// }
+	
+	/**
+	 * done to prevent the creating of a path every loop and save the CPU cycles
+	 */
+	private void incrementSlalomPath() {
+		if(!pathsDone){
+			System.out.println("slalomPathState pre ++: " + slalomPathState);
+			slalomPathState++;
+			robot.motor.setRightVelocity(0, 0);
+			robot.motor.setLeftVelocity(0, 0);
+			newSlalomPath();
+			// robot.intake.toggle();
+			System.out.println("slalomPathState post ++: " + slalomPathState);
+		}
+	}
+
+	public void slalomPath(){
+		if (trajectory == null) {
+			slalomPathState = 0;
+			newSlalomPath();
+			robot.odometry.driveOdometry.resetPosition(trajectory.getInitialPose(),
+					Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
+		}
+
+		// Test whether the robot is within the tolerance of the end point
+		boolean outXTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getX()) > GoalParams.getX() + GoalXTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getX()) < GoalParams.getX() - GoalXTolerance));
+		boolean outYTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getY()) > GoalParams.getY() + GoalYTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getY()) < GoalParams.getY() - GoalYTolerance));
+		boolean outAngleTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getRotation().getDegrees()) > GoalParams
+				.getRotation().getDegrees() + GoalAngleTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getRotation().getDegrees()) < GoalParams.getRotation().getDegrees()
+						- GoalAngleTolerance));
+
+		// if within tolerance increment path number the loop otherwise do drive loop
+		if ((!outXTolerance && !outYTolerance && !outAngleTolerance)) {
+			incrementSlalomPath();
+		} else {
+			loop();
+		}
+	}
+
+	private void newBarrelPath() {
+		//from the front bumper to the navX in inches divided by 12 to get feet
+		double frontToNavX = (18/12);
+		//some good points Y points for the robot
+		// last point is the position so the navX hits the point
+		double[][] pointsa = { { 0, 0, 0 }, { 12.5 - frontToNavX, 0 }, { 15 - frontToNavX, -2.5 }, { 11.5 - frontToNavX, -5 }, { 9 - frontToNavX, -2.5 }, { 14 - frontToNavX, 0 },
+		{ 20 - frontToNavX, -1 }, { 22.5 - frontToNavX, 2.5}, { 20 - frontToNavX, 5}, { 17.5 - frontToNavX, 2.5},
+		{ 24 - frontToNavX, -5}, {27 - frontToNavX, -2.5}, {22 - frontToNavX, 0}, {10 - frontToNavX, 0},
+		{ 0 , 0 , 180}};
+		//create a new path from the above parameters (all measurements in feet and angles)
+		switch (slalomPathState) {
+			case 0:
+				generateTrajectoryWithParameters(false, pointsa);
+				break;
+			default:
+				//tells the code it is done so it does not increment the path to infinity (and save resources in doing so)
+				pathsDone = true;
+		}
+		//put all of the goal parameters onto the network tables
+		robot.tables.driveGoalPosX.setDouble(GoalParams.getX());
+		robot.tables.driveGoalPosY.setDouble(GoalParams.getY());
+		robot.tables.driveGoalPosAngle.setDouble(GoalParams.getRotation().getDegrees());
+		robot.tables.drivePathPos.setNumber(barrelPathState);
+	}
+	
+	/**
+	 * done to prevent the creating of a path every loop and save the CPU cycles
+	 */
+	private void incrementBarrelPath() {
+		if(!pathsDone){
+			System.out.println("slalomPathState pre ++: " + slalomPathState);
+			slalomPathState++;
+			robot.motor.setRightVelocity(0, 0);
+			robot.motor.setLeftVelocity(0, 0);
+			newBarrelPath();
+			// robot.intake.toggle();
+			System.out.println("slalomPathState post ++: " + slalomPathState);
+		}
+	}
+
+	public void barrelPath(){
+		if (trajectory == null) {
+			barrelPathState = 0;
+			newBarrelPath();
+			robot.odometry.driveOdometry.resetPosition(trajectory.getInitialPose(),
+					Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
+		}
+
+		// Test whether the robot is within the tolerance of the end point
+		boolean outXTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getX()) > GoalParams.getX() + GoalXTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getX()) < GoalParams.getX() - GoalXTolerance));
+		boolean outYTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getY()) > GoalParams.getY() + GoalYTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getY()) < GoalParams.getY() - GoalYTolerance));
+		boolean outAngleTolerance = (((robot.odometry.driveOdometry.getPoseMeters().getRotation().getDegrees()) > GoalParams
+				.getRotation().getDegrees() + GoalAngleTolerance)
+				|| ((robot.odometry.driveOdometry.getPoseMeters().getRotation().getDegrees()) < GoalParams.getRotation().getDegrees()
+						- GoalAngleTolerance));
+
+		// if within tolerance increment path number the loop otherwise do drive loop
+		if ((!outXTolerance && !outYTolerance && !outAngleTolerance)) {
+			incrementBarrelPath();
+		} else {
+			loop();
+		}
+	}
+
+	
+	public void startAutos() {
+		robot.motor.leftEncoder.setPosition(0);
+		robot.motor.rightEncoder.setPosition(0);
+		robot.odometry.resetObometry();
+		autoStartTime = Timer.getFPGATimestamp();
+		state = 0;
+		bouncePathState = 0;
+		slalomPathState = 0;
+		barrelPathState = 0;
+		// robot.intake.toggle();
 	}
 
 	public void startAuto() {
 		robot.motor.leftEncoder.setPosition(0);
 		robot.motor.rightEncoder.setPosition(0);
-		driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
+		robot.odometry.resetObometry();
 		autoStartTime = Timer.getFPGATimestamp();
 		state = 0;
 		bouncePathState = 0;
+		slalomPathState = 0;
+		barrelPathState = 0;
 		// robot.intake.toggle();
 	}
 

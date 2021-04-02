@@ -36,7 +36,6 @@ public class Intake{
 	// turns off the motors for the intake
 	public void off(){
 		robot.pneumatics.intakeSolenoid.set(kOff);
-		robot.motor.intake.set(0);
 		robot.motor.intake2.set(0);
 	}
 
@@ -48,13 +47,11 @@ public class Intake{
 	// retracts the pneumatic for the intake
 	public void in(){
 		robot.pneumatics.intakeSolenoid.set(kForward);
-		robot.motor.intake.set(0);
 		robot.motor.intake2.set(0);
 	}
 
 	// turns on the motors for the intake
 	public void on(double speed){
-		robot.motor.intake.set(speed);
 		robot.motor.intake2.set(speed);
 	}
 }

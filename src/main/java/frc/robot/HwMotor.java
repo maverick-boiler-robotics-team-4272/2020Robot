@@ -44,15 +44,17 @@ public class HwMotor {
 	public final CANSparkMax hopper_infeed = new CANSparkMax(10, MotorType.kBrushless);
 	public final CANSparkMax hopper = new CANSparkMax(11, MotorType.kBrushless);
 	public final CANSparkMax miniShooter = new CANSparkMax(12, MotorType.kBrushless);
-	public final CANSparkMax intake = new CANSparkMax(13, MotorType.kBrushless);
+	// public final CANSparkMax intake = new CANSparkMax(13, MotorType.kBrushless);
 	public final CANPIDController intakePID;
-	public final CANEncoder intakeEncoder = intake.getEncoder();
 	public final CANSparkMax intake2 = new CANSparkMax(14, MotorType.kBrushless);
+	public final CANEncoder intakeEncoder = intake2.getEncoder();
 	public final CANSparkMax climberRight = new CANSparkMax(22, MotorType.kBrushless);
 	public final CANSparkMax climberLeft = new CANSparkMax(23, MotorType.kBrushless);
 	
 	public final TalonSRX shooter1 = new TalonSRX(15);
 	public final TalonSRX shooter2 = new TalonSRX(16);
+
+	public final CANSparkMax shooterHood = new CANSparkMax(17, MotorType.kBrushless);
 
 	public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
 	//taken from characterisation tool 1/27/2020
@@ -117,7 +119,7 @@ public class HwMotor {
 		robot.tables.pre_kD.setDouble(shooter_kD);
 		robot.tables.pre_kF.setDouble(shooter_kF);
 
-		intakePID = intake.getPIDController();
+		intakePID = intake2.getPIDController();
 		
 		intakePID.setOutputRange(-1, 1);
 		intakePID.setP(intake_kP);
@@ -175,7 +177,6 @@ public class HwMotor {
 		climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, true);
 		climberRight.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
-		intake.setSmartCurrentLimit(40, 20, 1000);
 		intake2.setSmartCurrentLimit(40, 20, 1000);
 		
 		miniShooter.setSmartCurrentLimit(30);
@@ -193,8 +194,13 @@ public class HwMotor {
 		climberLeft.setSmartCurrentLimit(70);
 		climberRight.setSmartCurrentLimit(70);
 
+		//Shooter Hood motor stuff
+		shooterHood.setSoftLimit(SoftLimitDirection.kForward, 8f);
+		shooterHood.setSoftLimit(SoftLimitDirection.kReverse, 0.5f);
+		shooterHood.enableSoftLimit(SoftLimitDirection.kForward, true);
+		shooterHood.enableSoftLimit(SoftLimitDirection.kReverse, true);
+
 		CPM.burnFlash();
-		intake.burnFlash();
 		intake2.burnFlash();
 		climberLeft.burnFlash();
 		climberRight.burnFlash();

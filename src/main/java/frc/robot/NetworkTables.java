@@ -86,11 +86,31 @@ public class NetworkTables {
 	public NetworkTableEntry driveGoalPosAngle = table.getEntry("posGoalAngle");
 	public NetworkTableEntry drivePathPos = table.getEntry("posPathNumber");
 
+	//testing the shooter code for distance
+	public NetworkTableEntry shooterDistance = table.getEntry("shooterDistance");
+
+	//get current path for auto
+	public NetworkTableEntry autoPathState = table.getEntry("autoPathState");
+
+	//hood positions
+	public NetworkTableEntry hoodEncoderCounts = table.getEntry("hoodEncoderCounts");
+	public NetworkTableEntry hoodSetpoint = table.getEntry("hoodSetpoint");
+
+
 	public NetworkTables(Robot robot) {
 		this.robot = robot;
 	}
 
 	public void postInit() {
+		table.addEntryListener("resetOdometry", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				robot.odometry.resetObometry();
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
 		table.addEntryListener("shooter_kP", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
@@ -280,7 +300,7 @@ public class NetworkTables {
 
 	public void logNetworkTables() {
 		intakeVel.setNumber(robot.motor.intakeEncoder.getVelocity());
-		intakeTemp.setNumber(robot.motor.intake.getMotorTemperature());
+		intakeTemp.setNumber(robot.motor.intake2.getMotorTemperature());
 		rightDriveVel.setNumber(robot.motor.rightEncoder.getVelocity());
 		rightDriveOutput.setNumber(robot.motor.right1.getAppliedOutput());
 		leftDriveVel.setNumber(robot.motor.leftEncoder.getVelocity());

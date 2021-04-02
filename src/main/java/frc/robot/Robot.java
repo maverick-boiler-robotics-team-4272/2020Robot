@@ -3,6 +3,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 
+
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -26,6 +30,8 @@ public class Robot extends TimedRobot {
 	// public NewAutoc auto;
 	public NetworkTables tables;
 	public AllBot allbot;
+	public Hood hood;
+	public Odometry odometry;
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -47,8 +53,13 @@ public class Robot extends TimedRobot {
 		// color = new ColorThing(this);
 		hopper = new Hopper(this);
 		allbot = new AllBot(this);
+		hood = new Hood(this);
+		odometry = new Odometry(this);
 
 		tables.postInit();
+
+		
+		// odometry.resetObometry();
 	}
 
 	/**
@@ -63,6 +74,14 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 		tables.logNetworkTables();
 		hopper.update_tables();
+
+		odometry.update();
+
+        tables.drivePosX.setDouble(odometry.driveOdometry.getPoseMeters().getX());
+        tables.drivePosY.setDouble(odometry.driveOdometry.getPoseMeters().getY());
+        tables.drivePosAngle.setDouble(odometry.driveOdometry.getPoseMeters().getRotation().getDegrees());
+
+		hood.getLidarDistance();
 	}
 
 	/**
@@ -99,8 +118,12 @@ public class Robot extends TimedRobot {
 				break;
 		}*/
 		allbot.loopAll();
-		auto.bouncePath();
+		// auto.bouncePath();
+		auto.slalomPath();
+		// auto.barrelPath();
 		// auto.loop();
+
+		
 	}
 
 	/**

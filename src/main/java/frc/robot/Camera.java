@@ -68,6 +68,9 @@ public class Camera {
 		is_driver_vision = true;
 	}
 
+	//Finds angle that hood should be
+	
+
 	//aims the robot based on the angle from the limelight
 	public boolean updateLimelightTracking() {
 		double UpperTolerance = -0.75;
