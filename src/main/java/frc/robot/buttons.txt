@@ -24,5 +24,7 @@ xbox controller:
 			x pressed = color rotation
 			b pressed = CPM pneumatics
 			y pressed = Climber pneumatics
+	
+	Climber extension/retraction: up and down on joysticks
 		   
 just testing #2 
