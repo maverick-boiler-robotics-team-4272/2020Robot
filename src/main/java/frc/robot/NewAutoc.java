@@ -230,7 +230,7 @@ public class NewAutoc {
 		switch (state) {
 			case 0:
 				if (robot.hopper.countBalls() != 0) { // this doesn't work because sometimes the balls are in blindspots
-					robot.teleop.rpm = 3650;
+					// robot.teleop.rpm = 3650;
 					robot.shooter.startShooter();
 					robot.hopper.shoot_balls();
 					shootCountdown = Timer.getFPGATimestamp();
@@ -238,7 +238,7 @@ public class NewAutoc {
 				} else if (Timer.getFPGATimestamp() > (shootCountdown + 2.0)) {
 					robot.shooter.stopShooter();
 					robot.hopper.stop_hopper();
-					robot.teleop.rpm = 4000;
+					// robot.teleop.rpm = 4000;
 					state++;
 				}
 				break;
@@ -258,7 +258,7 @@ public class NewAutoc {
 		switch (state) {
 			case 0:
 				if (robot.hopper.countBalls() != 0) { // this doesn't work because sometimes the balls are in blindspots
-					robot.teleop.rpm = 3650;
+					// robot.teleop.rpm = 3650;
 					robot.shooter.startShooter();
 					robot.hopper.shoot_balls();
 					shootCountdown = Timer.getFPGATimestamp();
@@ -266,7 +266,7 @@ public class NewAutoc {
 				} else if (Timer.getFPGATimestamp() > (shootCountdown + 2.0)) {
 					robot.shooter.stopShooter();
 					robot.hopper.stop_hopper();
-					robot.teleop.rpm = 4000;
+					// robot.teleop.rpm = 4000;
 					state++;
 				}
 				break;

@@ -55,6 +55,8 @@ public class HwMotor {
 	public final TalonSRX shooter2 = new TalonSRX(16);
 
 	public final CANSparkMax shooterHood = new CANSparkMax(17, MotorType.kBrushless);
+	public final CANPIDController hoodPID;
+	
 
 	public AHRS ahrs = new AHRS(SerialPort.Port.kUSB); 
 	//taken from characterisation tool 1/27/2020
@@ -66,6 +68,11 @@ public class HwMotor {
     private double shooter_kI = 0.0;
     private double shooter_kD = 0.025;
     private double shooter_kF = 0.01;
+
+	private double hood_kP = 0.06;
+	private double hood_kF = 0;
+	private double hood_kI = 0.0004;
+	private double hood_kD = 0;
     
 	private double intake_kP = 0;
 	private double intake_kF = 0;
@@ -174,8 +181,11 @@ public class HwMotor {
 		climberLeft.setSoftLimit(SoftLimitDirection.kReverse, 0.5f);
 		climberRight.setSoftLimit(SoftLimitDirection.kReverse, 0.5f);
 
-		climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, true);
-		climberRight.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		// climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		// climberRight.enableSoftLimit(SoftLimitDirection.kReverse, true);
+
+		climberLeft.enableSoftLimit(SoftLimitDirection.kReverse, false);
+		climberRight.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
 		intake2.setSmartCurrentLimit(40, 20, 1000);
 		
@@ -195,10 +205,19 @@ public class HwMotor {
 		climberRight.setSmartCurrentLimit(70);
 
 		//Shooter Hood motor stuff
-		shooterHood.setSoftLimit(SoftLimitDirection.kForward, 8f);
+		shooterHood.setSoftLimit(SoftLimitDirection.kForward, 13f);
 		shooterHood.setSoftLimit(SoftLimitDirection.kReverse, 0.5f);
 		shooterHood.enableSoftLimit(SoftLimitDirection.kForward, true);
 		shooterHood.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		shooterHood.setSmartCurrentLimit(20);
+
+		hoodPID = shooterHood.getPIDController(); 
+		
+		hoodPID.setOutputRange(-1, 1);
+		hoodPID.setP(hood_kP);
+		hoodPID.setI(hood_kI);
+		hoodPID.setD(hood_kD);
+		hoodPID.setFF(hood_kF);
 
 		CPM.burnFlash();
 		intake2.burnFlash();
@@ -223,5 +242,10 @@ public class HwMotor {
 		double feedforward = driveFeedForward.calculate(velocity, acceleration);
 		rightPID.setReference(velocity, ControlType.kVelocity, 0, feedforward);
 		robot.tables.rightDriveVelSetpoint.setNumber(velocity);
+	}
+
+	public void resetHoodPosition(){
+		shooterHood.getEncoder().setPosition(0);
+		shooterHood.set(0);
 	}
 }

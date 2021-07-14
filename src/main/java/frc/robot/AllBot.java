@@ -17,6 +17,7 @@ public class AllBot{
 		robot.intake.loop();
 		// robot.color.loop();
 		robot.hopper.loop();
+		robot.hood.loop();
 	}
 
 	/**

@@ -88,6 +88,7 @@ public class NetworkTables {
 
 	//testing the shooter code for distance
 	public NetworkTableEntry shooterDistance = table.getEntry("shooterDistance");
+	public NetworkTableEntry shooterHoodAngle = table.getEntry("hoodAngle");
 
 	//get current path for auto
 	public NetworkTableEntry autoPathState = table.getEntry("autoPathState");
@@ -95,6 +96,15 @@ public class NetworkTables {
 	//hood positions
 	public NetworkTableEntry hoodEncoderCounts = table.getEntry("hoodEncoderCounts");
 	public NetworkTableEntry hoodSetpoint = table.getEntry("hoodSetpoint");
+
+	public NetworkTableEntry shooterAngleTune = table.getEntry("shooterAngleTune");
+
+	public NetworkTableEntry alignKPTune = table.getEntry("alignKPTune");
+	public NetworkTableEntry alignKITune = table.getEntry("alignKITune");
+	public NetworkTableEntry alignKPTErr = table.getEntry("alignKPTErr");
+	public NetworkTableEntry alignKITErr = table.getEntry("alignKITErr");
+	public NetworkTableEntry alignTX = table.getEntry("alignTX");
+
 
 
 	public NetworkTables(Robot robot) {
@@ -277,25 +287,60 @@ public class NetworkTables {
 
 
 
-		table.addEntryListener("shooterVelHigh", new TableEntryListener() {
+
+
+
+		table.addEntryListener("shooterAngleTune", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
-				double shooterVelHigh = value.getDouble();
-				robot.teleop.rpmHigh = shooterVelHigh;
+				double angle = value.getDouble();
+				robot.shooter.shooterAngleTune = angle;
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 
-		table.addEntryListener("shooterVelLow", new TableEntryListener() {
+		table.addEntryListener("alignKPTune", new TableEntryListener() {
 			@Override
 			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
 					int flags) {
-				double shooterVelLow = value.getDouble();
-				robot.teleop.rpmLow =  shooterVelLow;
+				double KP = value.getDouble();
+				robot.camera.alignKP = KP;
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		table.addEntryListener("alignKITune", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				double KI = value.getDouble();
+				robot.camera.alignKI = KI;
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+
+
+		// table.addEntryListener("shooterVelHigh", new TableEntryListener() {
+		// 	@Override
+		// 	public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+		// 			int flags) {
+		// 		double shooterVelHigh = value.getDouble();
+		// 		robot.teleop.rpmHigh = shooterVelHigh;
+		// 	}
+
+		// }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+
+		// table.addEntryListener("shooterVelLow", new TableEntryListener() {
+		// 	@Override
+		// 	public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+		// 			int flags) {
+		// 		double shooterVelLow = value.getDouble();
+		// 		robot.teleop.rpmLow =  shooterVelLow;
+		// 	}
+
+		// }, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
 	}
 
 	public void logNetworkTables() {
@@ -305,6 +350,7 @@ public class NetworkTables {
 		rightDriveOutput.setNumber(robot.motor.right1.getAppliedOutput());
 		leftDriveVel.setNumber(robot.motor.leftEncoder.getVelocity());
 		leftDriveOutput.setNumber(robot.motor.left1.getAppliedOutput());
+		robot.tables.shooterDistance.setNumber(robot.hood.lidarLite.getDistance());
 	}
 
 	public void loop() {

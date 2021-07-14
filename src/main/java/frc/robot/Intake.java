@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class Intake{
 	Robot robot;//makes sure that it can access the rest of the robot
 
-	private boolean extended = false;
+	public boolean extended = false;
 
 	//instanciates the class
 	public Intake(Robot robot){

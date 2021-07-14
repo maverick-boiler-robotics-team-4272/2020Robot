@@ -1,6 +1,7 @@
 package frc.robot;
 
 
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -18,9 +19,6 @@ public class Teleop {
 
 	boolean is_auto = false;
 	double percentOutput = 0;
-	public double rpm = 3850;
-	public double rpmHigh = 3825;
-	public double rpmLow = 3650;
 	boolean shootActive = false;
 	private boolean climber_current_pos = false; // false is retracted true is extended
 	public static boolean colorSelectionTime = false;
@@ -90,33 +88,39 @@ public class Teleop {
 		//on our left joystick the front trigger button, that activates our auto aligning code for the limelight
 		if (robot.jstick.leftJoystick.getTrigger()) {
 			robot.camera.autoAlign();
+			drive(((leftSpeed+rightSpeed)/2) - robot.camera.alignTurnSpeed, ((leftSpeed+rightSpeed)/2) + robot.camera.alignTurnSpeed);
 		}else if(robot.jstick.leftJoystick.getTriggerReleased()){
 			robot.camera.driveVision();
+			robot.camera.alignTurnSpeed = 0;
 		}else{
 			drive(leftSpeed, rightSpeed);
 		}
 
-		//the slow version of the shooter
-		if(robot.jstick.rightJoystick.getTopPressed()){
-			rpm = rpmLow;
-
-			robot.hopper.shoot_balls();
-			robot.shooter.startShooter();
-		}else if(robot.jstick.rightJoystick.getTopReleased()){
-			robot.hopper.stop_hopper();
-			robot.shooter.stopShooter();
+		if(robot.jstick.leftJoystick.getTriggerPressed()){
+			robot.camera.totalError = 0;
 		}
+
+		//the slow version of the shooter
+		// if(robot.jstick.rightJoystick.getTopPressed()){
+		// 	rpm = rpmLow;
+
+		// 	robot.hopper.shoot_balls();
+		// 	robot.shooter.startShooter();
+		// }else if(robot.jstick.rightJoystick.getTopReleased()){
+		// 	robot.hopper.stop_hopper();
+		// 	robot.shooter.stopShooter();
+		// }
 
 
 		//the fast version of the shooter
 		if (robot.jstick.rightJoystick.getTriggerPressed()) {
-			rpm = rpmHigh;
             robot.hopper.shoot_balls();
             robot.shooter.startShooter();
 		} else if(robot.jstick.rightJoystick.getTriggerReleased()) {
             robot.hopper.stop_hopper();
             robot.shooter.stopShooter();
 		}
+
 
 		this.sendIt = robot.jstick.leftJoystick.getTop();
 
@@ -142,9 +146,9 @@ public class Teleop {
 			if(robot.hopper.countBalls() < 5){
 				if(Math.abs(robot.jstick.xbox.getTriggerAxis(Hand.kRight)) > 0.15) {
 					//reverses the intake is the left trigger is pressed in tandom with the right one
-					robot.intake.on(((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) + 0.15) * 0.75);
+					robot.intake.on((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) + 0.15) * 0.75);
 				}else {
-					robot.intake.on((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) - 0.15) * 0.75);
+					robot.intake.on(((robot.jstick.xbox.getTriggerAxis(Hand.kLeft) * -1) - 0.15) * 0.75);
 				}
 			}else{
 				robot.intake.off();
@@ -223,19 +227,45 @@ public class Teleop {
 			System.out.println("re-enabled climber limits");
 		}
 
-		if(robot.jstick.leftJoystick.getRawAxis(3)>0.1){
-			robot.motor.shooterHood.set((robot.jstick.leftJoystick.getRawAxis(3)*robot.jstick.leftJoystick.getRawAxis(3))/25
-			);
-			System.out.println("ShooterHood position: " + robot.motor.shooterHood.getEncoder().getPosition() * 6);
-		} else if(robot.jstick.rightJoystick.getRawAxis(3)>0.1){
-			robot.motor.shooterHood.set(((robot.jstick.rightJoystick.getRawAxis(3)*robot.jstick.rightJoystick.getRawAxis(3))/25)*-1);
-			System.out.println("ShooterHood position: " + robot.motor.shooterHood.getEncoder().getPosition() * 6);
-
-		} else if(robot.jstick.leftJoystick.getRawButtonPressed(3)){
-			robot.motor.shooterHood.set(0);
+		if(robot.jstick.leftJoystick.getRawAxis(3) > -0.9){
+			// given (-0.9, 1)
+			// want (0.5, 13)
+			// y = (x + 0.9) * ((13 - 0.5) / (1 - -0.9)) + 0.5
+			robot.motor.hoodPID.setReference((robot.jstick.leftJoystick.getRawAxis(3) + 0.9) * (12.5/1.9) + 0.5, ControlType.kPosition);
 		}
 
-		robot.tables.shooterDistance.setDouble(robot.hood.limeLightDegreesToDistance(robot.tables.limelightYDegrees.getDouble(0)));
+		if(robot.jstick.leftJoystick.getRawButton(3)){
+			System.out.println("Current Hood Position = " + robot.motor.shooterHood.getEncoder().getPosition());
+		}
+
+		if(robot.jstick.leftJoystick.getRawButtonPressed(7)){
+			//1st range shot(Distance = 62.69)
+			robot.motor.hoodPID.setReference(4.0, ControlType.kPosition);
+			System.out.println("short range");
+		}
+		if(robot.jstick.leftJoystick.getRawButtonPressed(6)){
+			//2nd range shot(Distance = 114.06)
+			robot.motor.hoodPID.setReference(5.55, ControlType.kPosition);
+			System.out.println("2nd range");
+		}
+		if(robot.jstick.leftJoystick.getRawButtonPressed(5)){
+			//3rd range shot(Distance = 192.68)
+			robot.motor.hoodPID.setReference(5.38, ControlType.kPosition);
+			System.out.println("3rd range");
+		}
+		if(robot.jstick.leftJoystick.getRawButtonPressed(8)){
+			//4th range shot(Distance = 252.04)
+			robot.motor.hoodPID.setReference(4.88/*(maybe 5.83)*/, ControlType.kPosition);
+			System.out.println("long range");
+		}
+		if(robot.jstick.rightJoystick.getRawButton(7)){
+			robot.shooter.startShooter();
+			robot.shooter.setShooterRPM();
+		}else if(robot.jstick.rightJoystick.getRawButtonReleased(7)){
+			robot.shooter.stopShooter();
+		}
+
+		// robot.tables.shooterDistance.setDouble(robot.hood.limeLightDegreesToDistance(robot.tables.limelightYDegrees.getDouble(0)));
 		// robot.tables.shooterDistance.setDouble(1.0);
 
 		//Setting Hood Angle with math
@@ -246,9 +276,15 @@ public class Teleop {
 		if(robot.jstick.leftJoystick.getRawButton(2)){
 			robot.hood.goToAngle(hoodAngle);
 		}else if(robot.jstick.leftJoystick.getRawButtonReleased(2)){
-			robot.motor.shooterHood.set(0);
-			hoodAngle = 0;
+			// robot.motor.shooterHood.set(0);
+			// hoodAngle = 0;
 		}
+
+		if(robot.jstick.rightJoystick.getRawButton(2)){
+			robot.motor.resetHoodPosition();
+		}
+		// robot.hood.getLidarDistance();
+		// System.out.println("" + robot.hood.lidarLite.getDistance());
 	}
 
 

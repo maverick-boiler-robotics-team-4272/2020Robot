@@ -41,14 +41,14 @@ public class Hopper {
     CANSparkMax hopper_infeed;
     CANSparkMax hopper;
     CANSparkMax shooter_infeed;
-    final double belt_speed = -0.4;
-    final double shooter_feeder_wheel = -0.4;
+    final double belt_speed = -0.2;
+    final double inbelt_speed = -0.2;
+    final double shooter_feeder_wheel = -0.3;
     final boolean intakeSwitch = true;
     public boolean needCorrections = false;
 
     private double current_intake_time = 0;
 
-    double rpm;
 
     public Hopper(Robot robot) {
         this.robot = robot;
@@ -66,13 +66,12 @@ public class Hopper {
         } else if(is_stopping){
             //movement(false, true);
         } else if(is_reversing) {
-            hopper_infeed.set(-1 * belt_speed);
+            hopper_infeed.set(-1 * inbelt_speed);
             hopper.set(-1 * belt_speed);
             shooter_infeed.set(-1 * shooter_feeder_wheel / 2);
         } else {
             disable();
         }
-        this.rpm = robot.teleop.rpm;
         if(!is_shooting && Timer.getFPGATimestamp() - current_intake_time > 1) {
             stop_hopper();
             current_intake_time = 0;
@@ -147,8 +146,8 @@ public class Hopper {
 
     private void movement(boolean shoot_button, boolean reverse) {
         // readArduino();
-        double upperDifference = (rpm / Shooter.SENSOR_TO_RPM) * 1.02;
-        double lowerDifference = (rpm / Shooter.SENSOR_TO_RPM) * 0.98;
+        double upperDifference = (robot.shooter.findRPM() / Shooter.SENSOR_TO_RPM) * 1.0075;
+        double lowerDifference = (robot.shooter.findRPM() / Shooter.SENSOR_TO_RPM) * 0.9925;
         //if(!reverse){
         if (!shoot_button) {
             if (!shooter_ball) {
@@ -159,7 +158,7 @@ public class Hopper {
                     // intake_control.off();
                 } else {
                     shooter_infeed.set(shooter_feeder_wheel);
-                    hopper_infeed.set(belt_speed);
+                    hopper_infeed.set(inbelt_speed);
                     hopper.set(belt_speed);
                     // intake_control.on();
                 }
@@ -169,18 +168,18 @@ public class Hopper {
                         if (!hopper_ball_b) {
                             if (!hopper_ball_a) {
                                 shooter_infeed.set(0);
-                                hopper_infeed.set(belt_speed);
+                                hopper_infeed.set(inbelt_speed);
                                 hopper.set(belt_speed);
                                 // intake_control.on();
                             } else {
                                 shooter_infeed.set(0);
-                                hopper_infeed.set(belt_speed);
+                                hopper_infeed.set(inbelt_speed);
                                 hopper.set(belt_speed);
                                 // intake_control.on();
                             }
                         } else {
                             shooter_infeed.set(0);
-                            hopper_infeed.set(belt_speed);
+                            hopper_infeed.set(inbelt_speed);
                             hopper.set(belt_speed);
                             // intake_control.on();
                         }
@@ -193,12 +192,12 @@ public class Hopper {
                 } else {
                     if (hopper_ball_a || hopper_ball_b || hopper_ball_c) {
                         shooter_infeed.set(0);
-                        hopper_infeed.set(belt_speed);
+                        hopper_infeed.set(inbelt_speed);
                         hopper.set(0);
                         // intake_control.on();
                     } else {
                         shooter_infeed.set(0);
-                        hopper_infeed.set(belt_speed);
+                        hopper_infeed.set(inbelt_speed);
                         hopper.set(belt_speed);
                         // intake_control.on();
                     }
@@ -207,8 +206,8 @@ public class Hopper {
         } else {
             if (robot.teleop.sendIt || (robot.motor.shooter1.getSelectedSensorVelocity() >= lowerDifference && robot.motor.shooter1.getSelectedSensorVelocity() <= upperDifference)){
                 shooter_infeed.set(-1);
-                hopper_infeed.set(-0.2);
-                hopper.set(-0.2);
+                hopper_infeed.set(-0.3);
+                hopper.set(-0.3);
             } else {
                 shooter_infeed.set(0);
                 hopper_infeed.set(0);

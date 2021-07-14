@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
 	public Intake intake;
 	// public ColorThing color;
 	public Hopper hopper;
-	public NewAuto auto;
+	public AutoForFiniteRecharge auto;
 	// public NewAutoc auto;
 	public NetworkTables tables;
 	public AllBot allbot;
@@ -41,8 +41,9 @@ public class Robot extends TimedRobot {
 		// passes robot to everything so anything can access anything
 		tables = new NetworkTables(this);
 		teleop = new Teleop(this);
-		auto = new NewAuto(this);
+		// auto = new NewAuto(this);
 		// auto = new NewAutoc(this);
+		auto = new AutoForFiniteRecharge(this);
 		motor = new HwMotor(this);
 		jstick = new HwJoystick();
 		camera = new Camera(this);
@@ -81,7 +82,8 @@ public class Robot extends TimedRobot {
         tables.drivePosY.setDouble(odometry.driveOdometry.getPoseMeters().getY());
         tables.drivePosAngle.setDouble(odometry.driveOdometry.getPoseMeters().getRotation().getDegrees());
 
-		hood.getLidarDistance();
+		tables.shooterHoodAngle.setNumber(this.motor.shooterHood.getEncoder().getPosition());
+		// System.out.println("ShooterHood position: " + this.motor.shooterHood.getEncoder().getPosition());
 	}
 
 	/**
@@ -119,9 +121,10 @@ public class Robot extends TimedRobot {
 		}*/
 		allbot.loopAll();
 		// auto.bouncePath();
-		auto.slalomPath();
+		// auto.slalomPath();
 		// auto.barrelPath();
 		// auto.loop();
+		auto.compPath();
 
 		
 	}

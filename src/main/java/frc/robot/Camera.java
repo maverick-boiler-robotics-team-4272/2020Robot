@@ -23,6 +23,13 @@ public class Camera {
 	double leftMotorSetpoint = 0;
 	double rightMotorSetpoint = 0;
 
+	double totalError = 0;
+	double alignTurnSpeed = 0;
+	double alignKP = 0.005;
+	double alignKI = 0.0002;
+	double maxKP = 0.2;
+	double maxKI = 0.1;
+
 	public Camera(Robot robot) {
 		this.robot = robot;
 	}
@@ -73,31 +80,71 @@ public class Camera {
 
 	//aims the robot based on the angle from the limelight
 	public boolean updateLimelightTracking() {
-		double UpperTolerance = -0.75;
-		double BottomTolerance = -0.5;
 		double tx = robot.tables.limelightXDegrees.getDouble(0);
-		double error = Math.min(Math.abs(tx) - UpperTolerance, Math.abs(tx) - BottomTolerance);
-		double multiplier = (Math.round(error / 6)) < 0 ? 1 : Math.round(error / 6);
-		double motorSpeed = 0.3;
-		double motorSpeedWMult = motorSpeed * multiplier;
 		double TargetFound = robot.tables.limelightValidTarget.getDouble(0);
-
+		robot.tables.alignTX.setDouble((tx));
 		if (TargetFound != 1) {
-			leftMotorSetpoint = -1;
-			rightMotorSetpoint = 1;
+			totalError = 0;
+			alignTurnSpeed = 0;
 		} else {
-			if (tx > UpperTolerance) {
-				leftMotorSetpoint = -motorSpeedWMult;
-				rightMotorSetpoint = motorSpeedWMult;
-			} else if (tx < BottomTolerance) {
-				leftMotorSetpoint = motorSpeedWMult;
-				rightMotorSetpoint = -motorSpeedWMult;
+			totalError += tx;
+			double currentTurnValue = 0;
+			// if(Math.abs(alignKP * tx)>= maxKP){
+			// 	currentTurnValue += ((alignKP * tx) > maxKP ? maxKP : -maxKP);
+			// } else {
+			// 	currentTurnValue += (alignKP * tx);
+			// }
+			currentTurnValue += (alignKP * tx);
+			robot.tables.alignKPTErr.setDouble((alignKP * tx));
+			if(Math.abs(alignKI * totalError) >= maxKI){
+				currentTurnValue += ((alignKI * totalError) > maxKI ? maxKI : (maxKI*-1));
+				robot.tables.alignKITErr.setDouble(((alignKI * totalError) > maxKI ? maxKI : (maxKI*-1)));
+			} else {
+				currentTurnValue += (alignKI * totalError);
+				robot.tables.alignKITErr.setDouble((alignKI * totalError));
 			}
+			alignTurnSpeed = currentTurnValue;
 		}
 
-		robot.motor.setLeftVelocity(leftMotorSetpoint, 0);
-		robot.motor.setRightVelocity(rightMotorSetpoint, 0);
-		if(motorSpeedWMult == 0){
+		if((Math.abs(tx) <= 1) && (TargetFound == 1)){
+			return true;
+		}
+		return false;
+	}
+
+	public boolean updateLimelightTracking(boolean auto) {
+		double tx = robot.tables.limelightXDegrees.getDouble(0);
+		double TargetFound = robot.tables.limelightValidTarget.getDouble(0);
+		robot.tables.alignTX.setDouble((tx));
+		if (TargetFound != 1) {
+			totalError = 0;
+			alignTurnSpeed = 0;
+		} else {
+			totalError += tx;
+			double currentTurnValue = 0;
+			// if(Math.abs(alignKP * tx)>= maxKP){
+			// 	currentTurnValue += ((alignKP * tx) > maxKP ? maxKP : -maxKP);
+			// } else {
+			// 	currentTurnValue += (alignKP * tx);
+			// }
+			currentTurnValue += (alignKP * tx);
+			robot.tables.alignKPTErr.setDouble((alignKP * tx));
+			if(Math.abs(alignKI * totalError) >= maxKI){
+				currentTurnValue += ((alignKI * totalError) > maxKI ? maxKI : (maxKI*-1));
+				robot.tables.alignKITErr.setDouble(((alignKI * totalError) > maxKI ? maxKI : (maxKI*-1)));
+			} else {
+				currentTurnValue += (alignKI * totalError);
+				robot.tables.alignKITErr.setDouble((alignKI * totalError));
+			}
+			alignTurnSpeed = currentTurnValue;
+		}
+
+		if(TargetFound != 1){
+			alignTurnSpeed = -0.2;
+			return false;
+		}
+
+		if((Math.abs(tx) <= 1.2) && (TargetFound == 1)){
 			return true;
 		}
 		return false;
