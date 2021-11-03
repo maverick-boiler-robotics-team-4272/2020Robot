@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.math.RoundingMode;
 
+import edu.wpi.first.wpilibj.util.Units;
+
 /**
  * Add your docs here.
  */
@@ -46,11 +48,15 @@ public class Camera {
 			numero = 1;
 		}
 		// publish led status to limelight network table
-		robot.tables.limelightLed.setNumber(3);
+		robot.tables.limelightLed.setNumber(numero);
 
 	}
 
 	public void loop() {
+		if(robot.auto.limelight){
+			changingLed(true);
+			return;
+		}
 		if (is_aligning) {
 			updateLimelightTracking();
 			changingLed(true);
@@ -89,11 +95,12 @@ public class Camera {
 		} else {
 			totalError += tx;
 			double currentTurnValue = 0;
-			// if(Math.abs(alignKP * tx)>= maxKP){
-			// 	currentTurnValue += ((alignKP * tx) > maxKP ? maxKP : -maxKP);
-			// } else {
-			// 	currentTurnValue += (alignKP * tx);
-			// }
+			 if(Math.abs(alignKP * tx)>= maxKP){
+			currentTurnValue += ((alignKP * tx) > maxKP ? maxKP : -maxKP);
+			} else {
+			currentTurnValue += (alignKP * tx);
+			}
+			//I am not sure if this code should be here
 			currentTurnValue += (alignKP * tx);
 			robot.tables.alignKPTErr.setDouble((alignKP * tx));
 			if(Math.abs(alignKI * totalError) >= maxKI){
@@ -148,5 +155,18 @@ public class Camera {
 			return true;
 		}
 		return false;
+	}
+
+	public double getDistLime(){
+		double ty = robot.tables.limelightYDegrees.getDouble(0); //Angle between limelight and target
+		double limeLightAngle = 17; //Angle of limelight to ground
+		double theta = ty + limeLightAngle; //Total angle
+		double goalHeight = Units.inchesToMeters(98.25); //Height of goal from ground
+		double limeLightHeight = Units.inchesToMeters(24.5); //Height of limelight to goal
+		double height = goalHeight - limeLightHeight; //Height between limeLight and goal
+		double distance = (height/Math.tan(theta)); //Distance from goal
+		System.out.println("Distance from goal inside function: " + distance);
+		return distance;
+
 	}
 }

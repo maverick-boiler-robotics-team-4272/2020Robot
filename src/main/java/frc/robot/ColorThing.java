@@ -12,7 +12,7 @@ import com.revrobotics.ColorMatch;
 public class ColorThing {
   Robot robot;
 
-  private final I2C.Port i2cPort = I2C.Port.kOnboard;
+  private final I2C.Port i2cPort = I2C.Port.kMXP;
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
 
   private final ColorMatch m_colorMatcher = new ColorMatch();
@@ -129,7 +129,9 @@ public class ColorThing {
 
   public void loop() {}
 
-  public void reset() {}
+  public void reset() {
+    robot.tables.FMSColor.setString(colorFromDriveStation());
+  }
 
 	public void colorSelection(String color /*recieved color from FMS*/) {//stage 3 of the match for color selection from FMS
 
@@ -188,7 +190,7 @@ public class ColorThing {
 		//gets the single letter from FMS to determine color
 		String gameData = DriverStation.getInstance().getGameSpecificMessage();
 
-		if(gameData.length() > 0){//tests if there is actuallt anything from FMS
+		if(gameData.length() > 0){//tests if there is actually anything from FMS
 			switch(gameData.charAt(0)){//gets the letter and reterns the full word because it is more human readable
 				case 'B' :
 					return "blue";

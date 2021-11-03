@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.TableEntryListener;
+import frc.robot.AutoForFiniteRecharge.typePath;
 
 public class NetworkTables {
 	Robot robot;
@@ -97,6 +98,8 @@ public class NetworkTables {
 	public NetworkTableEntry hoodEncoderCounts = table.getEntry("hoodEncoderCounts");
 	public NetworkTableEntry hoodSetpoint = table.getEntry("hoodSetpoint");
 
+	public NetworkTableEntry FMSColor = table.getEntry("FMSColor");
+
 	public NetworkTableEntry shooterAngleTune = table.getEntry("shooterAngleTune");
 
 	public NetworkTableEntry alignKPTune = table.getEntry("alignKPTune");
@@ -104,6 +107,8 @@ public class NetworkTables {
 	public NetworkTableEntry alignKPTErr = table.getEntry("alignKPTErr");
 	public NetworkTableEntry alignKITErr = table.getEntry("alignKITErr");
 	public NetworkTableEntry alignTX = table.getEntry("alignTX");
+
+	public NetworkTableEntry autoPathSet = table.getEntry("autoPathSet");
 
 
 
@@ -279,6 +284,29 @@ public class NetworkTables {
 					int flags) {
 				double driveNewKF = value.getDouble();
 				robot.motor.rightPID.setFF(driveNewKF);
+			}
+
+		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
+		
+		table.addEntryListener("autoPathSet", new TableEntryListener() {
+			@Override
+			public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value,
+					int flags) {
+				System.out.println("autoPath: " + value);
+				switch(value.getString()){
+					case "goal":
+						robot.auto.currentPath = typePath.PERPTOGOAL;
+						break;
+					case "trench":
+						robot.auto.currentPath = typePath.PARALELLTOCOLOR;
+						break;
+					case "shoot":
+						robot.auto.currentPath = typePath.ONLYSHOOT;
+						break;
+					case "nothing":
+						robot.auto.currentPath = typePath.DONOTHING;
+						break;
+				}
 			}
 
 		}, EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);

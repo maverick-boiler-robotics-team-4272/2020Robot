@@ -15,6 +15,9 @@ public class Shooter {
 
 	private boolean is_shooting = false;
 
+	public boolean fixedDistanceState = false;
+	public double fixedDistance = (135.43/12);
+
 	public Shooter(Robot robot) {
 		this.robot = robot;
 	}
@@ -30,9 +33,15 @@ public class Shooter {
 
 	public double findRPM(){
 		//75.7 + -0.657x + 3.63E-03x^2 + -7.56E-06x^3
+		// return 6500;
 		double height = 6; //6 feet
 		double gravityConst = 32.17; // 32.17 ft/s
-		double distance = (robot.hood.lidarLite.getDistance()/(2.53*12)+0.3); //converting LiDAR cm to ft
+		double distance;
+		if(fixedDistanceState){
+			distance = fixedDistance;
+		} else {
+			distance = (robot.hood.lidarLite.getDistance()/(2.53*12)+0.3); //converting LiDAR cm to ft
+		}
 		double distanceInches = distance * 12;
 		double C3 = -7.56E-06;
 		double C2 = 3.63E-03;

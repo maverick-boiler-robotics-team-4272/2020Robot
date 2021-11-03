@@ -60,7 +60,8 @@ public class AutoForFiniteRecharge {
     boolean turnClock = true;
     double turnTime = 0;
     double turnTimeStart = -1;
-    enum typePath {
+    boolean limelight = true;
+    public enum typePath {
         PERPTOGOAL,
         PARALELLTOCOLOR,
         ONLYSHOOT,
@@ -81,9 +82,26 @@ public class AutoForFiniteRecharge {
     double GoalAngleTolerance = 30;
     double bouncePathStart = 0;
     boolean pathsDone = false;
+    
 
     public AutoForFiniteRecharge(Robot robot) {
         this.robot = robot;
+        switch(currentPath){
+        case DONOTHING:
+            robot.tables.autoPathSet.setString("nothing");
+            break;
+        case ONLYSHOOT:
+            robot.tables.autoPathSet.setString("shoot");
+            break;
+        case PARALELLTOCOLOR:
+            robot.tables.autoPathSet.setString("trench");
+            break;
+        case PERPTOGOAL:
+            robot.tables.autoPathSet.setString("goal");
+            break;
+        default:
+            break;
+        }
     }
 
     // Copy of the generateTrajectory function, but using parameters to allow for
@@ -228,71 +246,13 @@ public class AutoForFiniteRecharge {
         // double[][] pointsb = { pointsa[pointsa.length], {}};
         // create a new path from the above parameters (all measurements in feet and
         // angles)
-        switch (compPathState) {
+        //switch (compPathState) {
+        switch (1){
         case 0:
             generateTrajectoryWithParameters(false, pointsa);
             break;
         case 1:
-            shoot = true;
-            intake = true;
-            setIntake = false;
-            robot.climber.down();
-            break;
-        case 2:
-            generateTrajectoryWithParameters(false, pointsb);
-            break;
-        case 3:
-            config = new TrajectoryConfig(Units.feetToMeters(3), Units.feetToMeters(2));
-            generateTrajectoryWithParameters(false, pointsc);
-            break;
-        case 4:
-            robot.hopper.stop_hopper();
-            break;
-        case 5:
-            intake = false;
-            robot.intake.off();
-            config = new TrajectoryConfig(Units.feetToMeters(14), Units.feetToMeters(10));
-            robot.shooter.setShooterRPM(2900);
-            generateTrajectoryWithParameters(true, pointsd);
-            break;
-        case 6:
-            aim = true;
-            break;
-        case 7:
-            shoot = true;
-            break;
-        default:
-            // tells the code it is done so it does not increment the path to infinity (and
-            // save resources in doing so)
-            robot.hopper.stop_hopper();
-            pathsDone = true;
-        }
-        // put all of the goal parameters onto the network tables
-        robot.tables.driveGoalPosX.setDouble(GoalParams.getX());
-        robot.tables.driveGoalPosY.setDouble(GoalParams.getY());
-        robot.tables.driveGoalPosAngle.setDouble(GoalParams.getRotation().getDegrees());
-        robot.tables.drivePathPos.setNumber(compPathState);
-    }
-
-    private void newColorPath() {
-        // from the front bumper to the navX in inches divided by 12 to get feet
-        double frontToNavX = (18 / 12);
-        // some good points Y points for the robot
-        // last point is the position so the navX hits the point
-        double[][] pointsa = { { 0, 0, 0 }, { 0, 0 }, { 0, 1, 30 } };
-        double[][] pointsb = { { pointsa[pointsa.length - 1][0], pointsa[pointsa.length - 1][1], 0 }, { 2.5 - frontToNavX, 2.5 },
-                { 7 - frontToNavX, 2.5, 0 } };
-        double[][] pointsc = { pointsb[pointsb.length-1], { 12 - frontToNavX, 2.5 }, {21 - frontToNavX, 2.5, 0} };
-        double[][] pointsd = { pointsc[pointsc.length-1], { 10, 0 }, { 0, 0, 0} };
-        // double[][] pointsb = { pointsa[pointsa.length], {}};
-        // create a new path from the above parameters (all measurements in feet and
-        // angles)
-        switch (compPathState) {
-        case 0:
-            generateTrajectoryWithParameters(false, pointsa);
-            break;
-        case 1:
-            aim = true;
+            robot.shooter.fixedDistanceState = true;
             shoot = true;
             intake = true;
             setIntake = false;
@@ -321,6 +281,115 @@ public class AutoForFiniteRecharge {
             break;
         case 7:
             shoot = true;
+            limelight = false;
+            robot.shooter.fixedDistanceState = false;
+            break;
+        default:
+            // tells the code it is done so it does not increment the path to infinity (and
+            // save resources in doing so)
+            robot.hopper.stop_hopper();
+            pathsDone = true;
+        }
+        // put all of the goal parameters onto the network tables
+        robot.tables.driveGoalPosX.setDouble(GoalParams.getX());
+        robot.tables.driveGoalPosY.setDouble(GoalParams.getY());
+        robot.tables.driveGoalPosAngle.setDouble(GoalParams.getRotation().getDegrees());
+        robot.tables.drivePathPos.setNumber(compPathState);
+    }
+
+    private void newColorPath() {
+        // from the front bumper to the navX in inches divided by 12 to get feet
+        double frontToNavX = (18 / 12);
+        // some good points Y points for the robot
+        // last point is the position so the navX hits the point
+        double[][] pointsa = { { 0, 0, 0 }, { 0, 0 }, { 0, 1, 30 } };
+        double[][] pointsb = { { pointsa[pointsa.length - 1][0], pointsa[pointsa.length - 1][1], 0 }, { 2.5 - frontToNavX, 2.5 },
+                { 7 - frontToNavX, 2.5, 0 } };
+        double[][] pointsc = { pointsb[pointsb.length-1], { 12 - frontToNavX, 2.5 }, {21 - frontToNavX, 2.5, 0} };
+        double[][] pointsd = { pointsc[pointsc.length-1], { 10, 0 }, { 0, 0, 0} };
+        // double[][] pointsb = { pointsa[pointsa.length], {}};
+        // create a new path from the above parameters (all measurements in feet and
+        // angles)
+        //switch (compPathState) {
+        switch (1) {
+        case 0:
+            generateTrajectoryWithParameters(false, pointsa);
+            break;
+        case 1:
+            robot.shooter.fixedDistanceState = true;
+            //aim = true;
+            aim = false;
+            shoot = true;
+            intake = true;
+            setIntake = false;
+            robot.climber.down();
+            break;
+        case 2:
+            generateTrajectoryWithParameters(false, pointsb);
+            break;
+        case 3:
+            config = new TrajectoryConfig(Units.feetToMeters(3), Units.feetToMeters(2));
+            generateTrajectoryWithParameters(false, pointsc);
+            break;
+        case 4:
+            robot.hopper.stop_hopper();
+            break;
+        case 5:
+            intake = false;
+            robot.intake.off();
+            robot.intake.in();
+            config = new TrajectoryConfig(Units.feetToMeters(14), Units.feetToMeters(10));
+            robot.shooter.setShooterRPM(2900);
+            generateTrajectoryWithParameters(true, pointsd);
+            break;
+        case 6:
+            aim = true;
+            break;
+        case 7:
+            shoot = true;
+            robot.shooter.fixedDistanceState = false;
+            limelight = false;
+            break;
+        default:
+            // tells the code it is done so it does not increment the path to infinity (and
+            // save resources in doing so)
+            robot.hopper.stop_hopper();
+            pathsDone = true;
+        }
+        // put all of the goal parameters onto the network tables
+        robot.tables.driveGoalPosX.setDouble(GoalParams.getX());
+        robot.tables.driveGoalPosY.setDouble(GoalParams.getY());
+        robot.tables.driveGoalPosAngle.setDouble(GoalParams.getRotation().getDegrees());
+        robot.tables.drivePathPos.setNumber(compPathState);
+    }
+
+    private void newShootPath(){
+        // from the front bumper to the navX in inches divided by 12 to get feet
+        double frontToNavX = (18 / 12);
+        // some good points Y points for the robot
+        // last point is the position so the navX hits the point
+        double[][] pointsa = { { 0, 0, 0 }, { 0, 0 }, { 0, 1, 0 } };
+        double[][] pointsb = { pointsa[pointsa.length - 1], { 5, 0 },
+                { 10, 0, 0 } };
+        // create a new path from the above parameters (all measurements in feet and
+        // angles)
+        //why are there three switch cases??
+        switch (compPathState) {
+        ///switch (1) {
+        case 0:
+            generateTrajectoryWithParameters(false, pointsa);
+            break;
+        case 1:
+            robot.shooter.fixedDistanceState = true;
+            //aim = true;
+            aim = false;
+            shoot = true;
+            robot.climber.down();
+            break;
+        case 2:
+            generateTrajectoryWithParameters(false, pointsb);
+            robot.shooter.fixedDistanceState = false;
+            limelight = false;
             break;
         default:
             // tells the code it is done so it does not increment the path to infinity (and
@@ -348,6 +417,11 @@ public class AutoForFiniteRecharge {
                 case PARALELLTOCOLOR:
                     newColorPath();
                     break;
+                case ONLYSHOOT:
+                    newShootPath();
+                    break;
+                case DONOTHING:
+                    break;
             }
             return;
         }
@@ -362,6 +436,11 @@ public class AutoForFiniteRecharge {
                     break;
                 case PARALELLTOCOLOR:
                     newColorPath();
+                    break;
+                case ONLYSHOOT:
+                    newShootPath();
+                    break;
+                case DONOTHING:
                     break;
             }
             System.out.println("slalomPathState post ++: " + compPathState);
@@ -386,7 +465,7 @@ public class AutoForFiniteRecharge {
                 return;
             } else {
                 robot.camera.updateLimelightTracking(true);
-                robot.teleop.drive(-robot.camera.alignTurnSpeed, robot.camera.alignTurnSpeed);
+                robot.teleop.drive((robot.camera.alignTurnSpeed*-1), robot.camera.alignTurnSpeed);
                 return;
             }
         }
