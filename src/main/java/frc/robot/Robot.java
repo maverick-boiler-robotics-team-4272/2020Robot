@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		// m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
 		auto.startAuto();
-	
+		auto.setPathOdometry();
 		// auto.generateTrajectory();
 	}
 
@@ -123,8 +123,8 @@ public class Robot extends TimedRobot {
 		// auto.bouncePath();
 		// auto.slalomPath();
 		// auto.barrelPath();
-		// auto.loop();
-		auto.compPath();
+		auto.loop();
+		//auto.compPath();
 
 		
 	}

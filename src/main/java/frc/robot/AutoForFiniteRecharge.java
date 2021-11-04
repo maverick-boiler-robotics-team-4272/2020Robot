@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +66,10 @@ public class AutoForFiniteRecharge {
         PERPTOGOAL,
         PARALELLTOCOLOR,
         ONLYSHOOT,
-        DONOTHING
+        DONOTHING,
+        TESTPATH
     }
-    typePath currentPath = typePath.PARALELLTOCOLOR;
+    typePath currentPath = typePath.TESTPATH;
 
     double timeStampLoop2 = 0;
     double shootCountdown = 0;
@@ -99,10 +101,20 @@ public class AutoForFiniteRecharge {
         case PERPTOGOAL:
             robot.tables.autoPathSet.setString("goal");
             break;
+        case TESTPATH:
+            try{
+                robot.tables.autoPathSet.setString("Test");
+                config = new TrajectoryConfig(Units.feetToMeters(3), Units.feetToMeters(2));
+                trajectory = TrajectoryUtil.fromPathweaverJson(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath(), "paths/output", "test-path.wpilib.json"));
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            break;
         default:
             break;
         }
-    }
+        
+        }
 
     // Copy of the generateTrajectory function, but using parameters to allow for
     // easier looping for bouncepath
@@ -526,6 +538,8 @@ public class AutoForFiniteRecharge {
         }
     }
 
+
+
     public void startAuto() {
         robot.motor.leftEncoder.setPosition(0);
         robot.motor.rightEncoder.setPosition(0);
@@ -533,5 +547,10 @@ public class AutoForFiniteRecharge {
         autoStartTime = Timer.getFPGATimestamp();
         state = 0;
         // robot.intake.toggle();
+    }
+
+    public void setPathOdometry() {
+        robot.odometry.driveOdometry.resetPosition(trajectory.getInitialPose(),
+            Rotation2d.fromDegrees(-1 * robot.motor.ahrs.getFusedHeading()));
     }
 }
